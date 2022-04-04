@@ -21,12 +21,9 @@ if (fileSystem.existsSync(secretsPath)) {
 var options = {
   mode: process.env.NODE_ENV || "development",
   entry: {
-    /* popup: path.join(__dirname, "src", "js", "popup.js"),
-    options: path.join(__dirname, "src", "js", "options.js"),
-    background: path.join(__dirname, "src", "js", "background.js") */
     contentScript: path.join(__dirname, "src", "js", "gmailInteraction.js"),
-    backgroundScript: path.join(__dirname, "src", "js", "encryption.js")
-
+    backgroundScript: path.join(__dirname, "src", "js", "backgroundScript.js"),
+    crypto: path.join(__dirname, "src", "js", "crypto.js")
   },
   output: {
     path: path.join(__dirname, "build"),
@@ -37,7 +34,7 @@ var options = {
       {
         test: /\.css$/,
         loader: "style-loader!css-loader",
-        exclude: /node_modules/
+       // exclude: /node_modules/
       },
       {
         test: new RegExp('.(' + fileExtensions.join('|') + ')$'),
