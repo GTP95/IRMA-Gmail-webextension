@@ -39,7 +39,7 @@ export async function decrypt(readable, writable, identifier){
         };
 
     try {
-        const unsealer = await mod.Unsealer.new(unsealerReadable);
+        const unsealer = await module.Unsealer.new(readable);
         const hidden = unsealer.get_hidden_policies();
         console.log("hidden policy: ", hidden);
 
