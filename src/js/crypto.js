@@ -91,4 +91,4 @@ export async function decrypt(readable, writable, identifier){
 
     }
 
-initialize().then(() => console.log("BackgroundScript initialized"));
+initialize().then(() => console.log("Crypto module initialized"));

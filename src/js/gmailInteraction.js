@@ -1,30 +1,42 @@
 console.log("ContentScript loaded")
-let ciphertext;
+let cipherText;
 
-const encryptionPort = chrome.runtime.connect({name: "encryption"});    //create a port to handel message passing for encryption
-encryptionPort.postMessage(
-    {plaintext: "hello"}
-);
-encryptionPort.onMessage.addListener((response) => {    //handler for incoming messages
+const cryptoPort = chrome.runtime.connect({name: "cryptoPort"});    //create a port to handel message passing for encryption
+
+cryptoPort.onDisconnect.addListener(()=>console.log("PORT CLOSED!!!"))
+cryptoPort.onMessage.addListener((response) => {    //handler for incoming messages
     if(response===undefined) console.log("Got called, but response is undefined...");
-    else if(response.successful){
-        ciphertext=response.ciphertext;
-        console.log("ciphertext: ", ciphertext);
-    }
-    else if(!response.successful) console.log("Encryption failed");
+    switch (response.content){
 
-    console.log("First message sent")
+        case "ciphertext":
+            if(response.successful){
+                cipherText=response.ciphertext
+                console.log("ciphertext: ", cipherText)
+            }
+            else console.log("Encryption failed")
+            break;
+
+        case "plaintext":
+            if(response.successful){
+                console.log("Decryption successful")
+            }
+            else console.log("Decryption failed")
+            break
+    }
+
 });
 
-const decryptionPort = chrome.runtime.connect({name: "decryption"});
-decryptionPort.postMessage(
-    {ciphertext: ciphertext}
-);
-decryptionPort.onMessage.addListener(
-    (response) =>{
-        console.log("Decryption result received");
-        if(response===undefined) console.log("Got called, but response is undefined...");
-        else if(response.successful) console.log("plaintext: ", response.plaintext);
-        else if(!response.successful) console.log("Decryption failed");
+cryptoPort.postMessage(
+    {
+        ciphertext: cipherText,
+        request: "decrypt"
     }
 )
+
+cryptoPort.postMessage(
+    {
+        plaintext: "hello",
+        request: "encrypt"
+    }
+);
+
