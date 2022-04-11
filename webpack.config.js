@@ -22,7 +22,6 @@ var options = {
   mode: process.env.NODE_ENV || "development",
   entry: {
     contentScript: path.join(__dirname, "src", "js", "gmailInteraction.js"),
-    backgroundScript: path.join(__dirname, "src", "js", "backgroundScript.js"),
     crypto: path.join(__dirname, "src", "js", "crypto.js")
   },
   output: {

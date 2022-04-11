@@ -26,6 +26,11 @@
   resolved "https://registry.yarnpkg.com/@privacybydesign/irma-css/-/irma-css-0.4.3.tgz#09ce5348f9ab76acd2c471a9c92c6eb277509eaf"
   integrity sha512-jCUFgzWpka3xjthO3iLmkvMowTesNQijk2Y6dz7f/mny/Skm1RwnLzwgyqtzraZZ1O2Yio0/U7ZfCE9kkVDV0Q==
 
+"@privacybydesign/irma-frontend@^0.4.3":
+  version "0.4.3"
+  resolved "https://registry.yarnpkg.com/@privacybydesign/irma-frontend/-/irma-frontend-0.4.3.tgz#5d1389ecc9d3e08bef175756830f934f460de484"
+  integrity sha512-1UFNUI4cqAYXFndgcywckgEZKYqtz/eTXmH83gFNYkeBQzv8PKygowrrSOFlb5HUWaXCNnMeTTxVnZH4eLy9EQ==
+
 "@privacybydesign/irma-popup@^0.4.3":
   version "0.4.3"
   resolved "https://registry.yarnpkg.com/@privacybydesign/irma-popup/-/irma-popup-0.4.3.tgz#4705e708fe42458259cfabfda994401636bb3b04"

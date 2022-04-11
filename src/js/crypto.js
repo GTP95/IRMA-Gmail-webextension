@@ -4,13 +4,17 @@ import * as IrmaPopup from "@privacybydesign/irma-popup";
 import "@privacybydesign/irma-css";
 
 
-const url="https://main.irmaseal-pkg.ihub.ru.nl"
+const url = "https://main.irmaseal-pkg.ihub.ru.nl"
 let module, mpk;    //Need those as global variables to have the initialize function initialize them and then use them in other functions
+const pkg = url //lol Bruschi eas right, no copy&paste...
 
-async function initialize(){
+export async function cryptoInitialize() {
     // Load the WASM module.
-    module = await import("@e4a/irmaseal-wasm-bindings")
-    console.log(module)
+    module = await import("@e4a/irmaseal-wasm-bindings").then(
+        ()=>console.log(module),
+        ()=>console.log("Failed loading module @e4a/irmaseal-wasm-bindings")
+    )
+
 // Retrieve the public key from PKG API:
     const resp = await fetch(`${url}/v2/parameters`);
     mpk = await resp.json().then((r) => r.publicKey);
@@ -23,7 +27,7 @@ export async function encrypt(readable, writable, identifier) {
     const policies = {
         [identifier]: {
             ts: Math.round(Date.now() / 1000),
-            con: [{ t: "irma-demo.gemeente.personalData.fullname", v: identifier }],
+            con: [{t: "irma-demo.gemeente.personalData.fullname", v: identifier}],
         },
     };
     console.log("Encrypting using policies: ", policies);
@@ -33,34 +37,37 @@ export async function encrypt(readable, writable, identifier) {
     await module.seal(mpk, policies, readable, writable);
 }
 
-export async function decrypt(readable, writable, identifier){
-    const guess = {
-          con: [{ t: "irma-demo.gemeente.personalData.fullname", v: identifier }],
-        };
-
+export async function decrypt(readable, writable, identifier) {
     try {
         const unsealer = await module.Unsealer.new(readable);
         const hidden = unsealer.get_hidden_policies();
         console.log("hidden policy: ", hidden);
 
-        // Guess it right, order should not matter
-        const guess = {
-            con: [{ t: "irma-demo.gemeente.personalData.fullname", v: identifier }],
+        const keyRequest = {
+            con: [{t: "irma-demo.gemeente.personalData.fullname", v: identifier}],
+            validity: 600, // 1 minute
         };
-    }
-    catch (e){
-        console.log(e);
-    }
+
+        const timestamp = hidden[identifier].ts;
+
         const session = {
-            url,
+            url: pkg,
             start: {
                 url: (o) => `${o.url}/v2/request/start`,
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
+                method: "POSTF",
+                headers: {"Content-Type": "application/json"},
                 body: JSON.stringify(keyRequest),
             },
+            mapping: {
+                // temporary fix
+                sessionPtr: (r) => {
+                    const ptr = r.sessionPtr;
+                    ptr.u = `https://ihub.ru.nl/irma/1/${ptr.u}`;
+                    return ptr;
+                },
+            },
             result: {
-                url: (o, { sessionToken }) => `${o.url}/v2/request/jwt/${sessionToken}`,
+                url: (o, {sessionToken}) => `${o.url}/v2/request/jwt/${sessionToken}`,
                 parseResponse: (r) => {
                     return r
                         .text()
@@ -81,14 +88,62 @@ export async function decrypt(readable, writable, identifier){
                 },
             },
         };
-    var irma = new IrmaCore({ debugging: true, session });
-    irma.use(IrmaClient);
-    irma.use(IrmaPopup);
-    const usk = await irma.start();
 
-// Unseal the contents of the IRMAseal packet, writing the plaintext to a `WritableStream`.
-    await unsealer.unseal("recipient_1", usk, writable);
+        const irma = new IrmaCore({debugging: true, session});
 
+        irma.use(IrmaClient);
+        irma.use(IrmaPopup);
+
+        const usk = await irma.start();
+        console.log("retrieved usk: ", usk);
+
+        const t0 = performance.now();
+
+        await unsealer.unseal(identifier, usk, writable);
+
+        const tDecrypt = performance.now() - t0;
+
+        console.log(`tDecrypt ${tDecrypt}$ ms`);
+    } catch (e) {
+        console.log("error during unsealing: ", e);
     }
 
-initialize().then(() => console.log("Crypto module initialized"));
+
+}
+
+export function simpleReadableStream(unencodedData){
+    const readableStream = new ReadableStream({
+        start: (controller) => {
+            const encoded = new TextEncoder().encode(unencodedData);
+            controller.enqueue(encoded);
+            controller.close();
+        },
+    });
+
+    return readableStream
+}
+
+export function simpleEncodedReadableStream(encodedData){
+    const readableStream = new ReadableStream({
+        start: (controller) => {
+            controller.enqueue(encodedData);
+            controller.close();
+        },
+    });
+
+    return readableStream
+}
+
+export function simpleWritableStream(){
+    let sink = new Uint8Array(0);
+    const writableStream = new WritableStream({
+        write: (chunk) => {
+            sink = new Uint8Array([...sink, ...chunk]);
+        },
+    });
+    return {
+        "sink": sink,
+        "stream": writableStream
+    }
+}
+
