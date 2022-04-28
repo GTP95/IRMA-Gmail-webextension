@@ -17,6 +17,16 @@ async function initialize(){
     console.log("Using key: ", mpk)
 }
 
+function createReadableStream(content){
+    console.log("Type: ", typeof content)
+    return  new ReadableStream({
+        start: (controller) => {
+            controller.enqueue(content);
+            controller.close();
+        },
+    });
+}
+
 
 export async function encrypt(readable, writable, identifier) {
 // We provide the policies which we want to use for encryption.
@@ -89,6 +99,13 @@ export async function decrypt(readable, writable, identifier){
 // Unseal the contents of the IRMAseal packet, writing the plaintext to a `WritableStream`.
     await unsealer.unseal("recipient_1", usk, writable);
 
+    }
+
+    export async function getHiddenPolicies(ciphertext) {
+        let unsealerReadable = createReadableStream(ciphertext)
+        let unsealer = await module.Unsealer.new(unsealerReadable);
+        const hidden = unsealer.get_hidden_policies();
+        return hidden
     }
 
 initialize().then(() => console.log("Crypto module initialized"));
