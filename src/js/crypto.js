@@ -61,66 +61,23 @@ export async function encrypt(readable, writable, identifier) {
  * Decrypt a ReadableStream into a WritableStream using IRMA
  * @param readable {ReadableStream}
  * @param writable {WritableStream}
- * @param identifier {String}
+ * @param usk {String}
  * @returns {Promise<void>} //It's just an empty promise... :D
  */
-export async function decrypt(readable, writable, identifier){
-    const guess = {
-          con: [{ t: "irma-demo.gemeente.personalData.fullname", v: identifier }],
-        };
-
+export async function decrypt(readable, writable, usk) {
     try {
+
         const unsealer = await module.Unsealer.new(readable);
-        const hidden = unsealer.get_hidden_policies();
-        console.log("hidden policy: ", hidden);
-
-        // Guess it right, order should not matter
-        const guess = {
-            con: [{ t: "irma-demo.gemeente.personalData.fullname", v: identifier }],
-        };
-    }
-    catch (e){
-        console.log(e);
-    }
-        const session = {
-            url,
-            start: {
-                url: (o) => `${o.url}/v2/request/start`,
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(keyRequest),
-            },
-            result: {
-                url: (o, { sessionToken }) => `${o.url}/v2/request/jwt/${sessionToken}`,
-                parseResponse: (r) => {
-                    return r
-                        .text()
-                        .then((jwt) =>
-                            fetch(`${pkg}/v2/request/key/${timestamp.toString()}`, {
-                                headers: {
-                                    Authorization: `Bearer ${jwt}`,
-                                },
-                            })
-                        )
-                        .then((r) => r.json())
-                        .then((json) => {
-                            if (json.status !== "DONE" || json.proofStatus !== "VALID")
-                                throw new Error("not done and valid");
-                            return json.key;
-                        })
-                        .catch((e) => console.log("error: ", e));
-                },
-            },
-        };
-    var irma = new IrmaCore({ debugging: true, session });
-    irma.use(IrmaClient);
-    irma.use(IrmaPopup);
-    const usk = await irma.start();
-
-// Unseal the contents of the IRMAseal packet, writing the plaintext to a `WritableStream`.
-    await unsealer.unseal("recipient_1", usk, writable);
+        // Unseal the contents of the IRMAseal packet, writing the plaintext to a `WritableStream`.
+        await unsealer.unseal("recipient_1", usk, writable)
 
     }
+catch
+        (error){
+            console.log(error)
+        }
+
+}
 
     export async function getHiddenPolicies(ciphertext) {
         let unsealerReadable = createReadableStream(ciphertext)

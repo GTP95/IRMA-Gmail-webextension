@@ -10,7 +10,7 @@ import {encrypt, decrypt, getHiddenPolicies} from "./crypto";
 chrome.runtime.onConnect.addListener(function (port) {
     console.assert(port.name === "crypto");
     port.onMessage.addListener(async function (msg) {
-        let writableStream, readableStream, result, unsealer;
+        let writableStream, readableStream, result;
         readableStream = new ReadableStream({
             start: (controller) => {
                 const encoded = new TextEncoder().encode(msg.content);
@@ -47,13 +47,25 @@ chrome.runtime.onConnect.addListener(function (port) {
                 break
 
             case "decrypt":
-                decrypt(readableStream, writableStream, "Alice").then(
-                    () => port.postMessage(   //Decryption successful
+                //Temporary hack to test decryption of something I'm encrypting myself: reassign readablestream
+                readableStream = new ReadableStream({
+                    start: (controller) => {
+                        const encoded = new Uint8Array(msg.content);
+                        controller.enqueue(encoded);
+                        controller.close();
+                    },
+                });
+                decrypt(readableStream, writableStream, msg.usk).then(
+                    () =>{
+                        result=(new TextDecoder()).decode(result)
+                        console.log("Decrypted plaintext: ", result)
+                        port.postMessage(   //Decryption successful
                         {
                             plaintext: result,
                             type: "plaintext"
                         }
-                    ),
+                    )
+                    },
                     () => port.postMessage(   //Decryption unsuccessful
                         {
                             plaintext: "NOT DECRYPTED!",
