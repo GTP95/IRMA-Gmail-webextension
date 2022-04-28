@@ -1,7 +1,10 @@
+// @ts-check
+
+
 import * as IrmaCore from "@privacybydesign/irma-core";
 import * as IrmaClient from "@privacybydesign/irma-client";
 import * as IrmaPopup from "@privacybydesign/irma-popup";
-import("@privacybydesign/irma-css");
+import "@privacybydesign/irma-css";
 
 console.log("ContentScript loaded")
 

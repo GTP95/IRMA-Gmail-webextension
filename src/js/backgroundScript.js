@@ -1,3 +1,6 @@
+// @ts-check
+
+
 import {encrypt, decrypt, getHiddenPolicies} from "./crypto";
 
 

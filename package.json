@@ -27,6 +27,7 @@
     "@privacybydesign/irma-css": "^0.4.3",
     "@privacybydesign/irma-frontend": "^0.4.3",
     "@privacybydesign/irma-popup": "^0.4.3",
-    "@types/chrome": "^0.0.180"
+    "@types/chrome": "^0.0.180",
+    "typescript": "^4.6.3"
   }
 }
