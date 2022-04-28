@@ -22,12 +22,14 @@
   },
   "dependencies": {
     "@e4a/irmaseal-wasm-bindings": "0.2.0-beta.5",
+    "@inboxsdk/core": "^0.2.7",
     "@privacybydesign/irma-client": "^0.4.3",
     "@privacybydesign/irma-core": "^0.4.3",
     "@privacybydesign/irma-css": "^0.4.3",
     "@privacybydesign/irma-frontend": "^0.4.3",
     "@privacybydesign/irma-popup": "^0.4.3",
     "@types/chrome": "^0.0.180",
+    "@types/inboxsdk": "^2.0.8",
     "typescript": "^4.6.3"
   }
 }

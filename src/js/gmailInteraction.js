@@ -41,7 +41,6 @@ function ensureHiddenPoliciesIsSet(timeout){    //See https://codepen.io/eanbowm
  */
 async function askForDecryption(ciphertext){
     console.log("Asking for decryption now")
-    let hidden
     //First, we need to get the hidden policies. Let's ask the BackgroundScript for this
     port.postMessage(
         {
@@ -174,8 +173,3 @@ ensureCiphertextIsSet(5000).then(
     )
 )
 
-var google = document.getElementById("main");
-var button = document.createElement("button");
-var text = document.createTextNode("test");
-button.appendChild(text);
-google.appendChild(button);
