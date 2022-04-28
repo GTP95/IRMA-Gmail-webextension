@@ -8,22 +8,29 @@ import "@privacybydesign/irma-css";
 
 console.log("ContentScript loaded")
 
-let ciphertext, hiddenPolicies;
+let ciphertext, hiddenPolicies, identity="Alice"
 
-function pollForCiphertext(){
-    if (ciphertext){
-        askForDecryption(ciphertext)
+function ensureCiphertextIsSet(timeout){    //See https://codepen.io/eanbowman/pen/jxqKjJ for how this works
+    const start=Date.now()
+    return new Promise(waitForCiphertext)
+
+    function waitForCiphertext(resolve, reject){
+        if(ciphertext) resolve(ciphertext)
+        else if(timeout && Date.now()-start>=timeout) reject("Timeout")
+        else setTimeout(waitForCiphertext.bind(this, resolve, reject), 100)
     }
-    else setTimeout(pollForCiphertext, 100)
+
 }
 
+function ensureHiddenPoliciesIsSet(timeout){    //See https://codepen.io/eanbowman/pen/jxqKjJ for how this works
+    const start=Date.now()
+    return new Promise(waitForHiddenPolicies)
 
-function pollHiddenPolicies(){
-    console.log("Now polling for hidden policies")
-    if(hiddenPolicies){
-        console.log("hidden policies: ", hiddenPolicies)
+    function waitForHiddenPolicies(resolve, reject){
+        if(hiddenPolicies) resolve(hiddenPolicies)
+        else if(timeout && Date.now()-start>=timeout) reject("Timeout")
+        else setTimeout(waitForHiddenPolicies.bind(this, resolve, reject), 100)
     }
-    else setTimeout(hiddenPolicies, 100)
 }
 
 
@@ -42,10 +49,6 @@ async function askForDecryption(ciphertext){
             request: "hidden policies"
         }
     )
-
-    //We will, hopefully and eventually, get an answer. The hidden policies are stored in the variable "hiddenPolicies"
-    //Let's start polling for the answer
-    pollHiddenPolicies()
 }
 
 const port = chrome.runtime.connect({name: "crypto"});
@@ -82,4 +85,10 @@ port.postMessage(
     }
 );
 
-pollForCiphertext()
+ensureCiphertextIsSet(5000).then(
+    (ciphertext)=>askForDecryption(ciphertext).then(
+        ()=>ensureHiddenPoliciesIsSet(2000).then(
+            (hiddenPolicies)=>console.log("Hidden policies keys: ", Object.keys(hiddenPolicies))
+        )
+    )
+)
