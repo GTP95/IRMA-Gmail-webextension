@@ -164,6 +164,7 @@ ensureCiphertextIsSet(5000).then(
                 (usk)=> port.postMessage(
                     {
                         content: ciphertext,
+                        identity: identity,
                         usk: usk,
                         request: "decrypt"
                     }

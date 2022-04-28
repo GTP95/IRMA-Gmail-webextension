@@ -47,15 +47,18 @@ chrome.runtime.onConnect.addListener(function (port) {
                 break
 
             case "decrypt":
-                //Temporary hack to test decryption of something I'm encrypting myself: reassign readablestream
+                //Temporary hack to test decryption of something I'm encrypting myself: reassign readableStream
+                let array=Uint8Array.from(Object.values(msg.content))  //Messaging messes up types, here I'm converting it back to the correct type: Uint8array
+                console.log("type of ciphertext passed to unsealer: ", typeof array)
+                console.log("ciphertext passed to unsealer: ", array)
                 readableStream = new ReadableStream({
                     start: (controller) => {
-                        const encoded = new Uint8Array(msg.content);
+                        const encoded = array
                         controller.enqueue(encoded);
                         controller.close();
                     },
                 });
-                decrypt(readableStream, writableStream, msg.usk).then(
+                decrypt(readableStream, writableStream, msg.usk, msg.identity).then(
                     () =>{
                         result=(new TextDecoder()).decode(result)
                         console.log("Decrypted plaintext: ", result)

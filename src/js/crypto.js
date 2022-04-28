@@ -64,12 +64,12 @@ export async function encrypt(readable, writable, identifier) {
  * @param usk {String}
  * @returns {Promise<void>} //It's just an empty promise... :D
  */
-export async function decrypt(readable, writable, usk) {
+export async function decrypt(readable, writable, usk, identity) {
     try {
 
         const unsealer = await module.Unsealer.new(readable);
         // Unseal the contents of the IRMAseal packet, writing the plaintext to a `WritableStream`.
-        await unsealer.unseal("recipient_1", usk, writable)
+        await unsealer.unseal(identity, usk, writable)
 
     }
 catch
