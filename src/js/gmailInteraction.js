@@ -173,3 +173,9 @@ ensureCiphertextIsSet(5000).then(
         )
     )
 )
+
+var google = document.getElementById("main");
+var button = document.createElement("button");
+var text = document.createTextNode("test");
+button.appendChild(text);
+google.appendChild(button);
