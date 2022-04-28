@@ -27,6 +27,11 @@ function pollHiddenPolicies(){
 }
 
 
+/**
+ *
+ * @param {Uint8Array} ciphertext
+ * @returns {Promise<void>}
+ */
 async function askForDecryption(ciphertext){
     console.log("Asking for decryption now")
     let hidden
@@ -50,7 +55,7 @@ port.onMessage.addListener(function(msg) {
     switch (msg.type){
 
         case "ciphertext":
-            ciphertext=msg.ciphertext
+            ciphertext=msg.ciphertext //BEWARE: messaging messes up types, here we have an object, not an Uint8array!
             break
 
         case "plaintext":

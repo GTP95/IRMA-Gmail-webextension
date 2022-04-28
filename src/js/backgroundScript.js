@@ -64,7 +64,8 @@ chrome.runtime.onConnect.addListener(function (port) {
                 break
 
             case "hidden policies":
-                getHiddenPolicies(msg.content).then(
+                let uint8array=Uint8Array.from(Object.values(msg.content))  //Messaging messes up types, here I'm converting it back to the correct type: Uint8array
+                getHiddenPolicies(uint8array).then(
                     (hidden)=>port.postMessage(
                         {
                             content: hidden,

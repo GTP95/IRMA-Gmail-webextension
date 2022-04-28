@@ -20,6 +20,11 @@ async function initialize(){
     console.log("Using key: ", mpk)
 }
 
+/**
+ *
+ * @param {Uint8Array} content
+ * @returns {ReadableStream<any>}
+ */
 function createReadableStream(content){
     console.log("Type: ", typeof content)
     return  new ReadableStream({
@@ -30,7 +35,13 @@ function createReadableStream(content){
     });
 }
 
-
+/**
+ * Encrypt a ReadableStream into a WritableStream using IRMA
+ * @param readable {ReadableStream}
+ * @param writable {WritableStream}
+ * @param identifier {String}
+ * @returns {Promise<void>}
+ */
 export async function encrypt(readable, writable, identifier) {
 // We provide the policies which we want to use for encryption.
     const policies = {
@@ -46,6 +57,13 @@ export async function encrypt(readable, writable, identifier) {
     await module.seal(mpk, policies, readable, writable);
 }
 
+/**
+ * Decrypt a ReadableStream into a WritableStream using IRMA
+ * @param readable {ReadableStream}
+ * @param writable {WritableStream}
+ * @param identifier {String}
+ * @returns {Promise<void>} //It's just an empty promise... :D
+ */
 export async function decrypt(readable, writable, identifier){
     const guess = {
           con: [{ t: "irma-demo.gemeente.personalData.fullname", v: identifier }],
