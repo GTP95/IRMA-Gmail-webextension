@@ -23,7 +23,9 @@ var options = {
   entry: {
     contentScript: path.join(__dirname, "src", "js", "gmailInteraction.js"),
     backgroundScript: path.join(__dirname, "src", "js", "backgroundScript.js"),
-    crypto: path.join(__dirname, "src", "js", "crypto.js")
+    crypto: path.join(__dirname, "src", "js", "crypto.js"),
+    pageWorld: '@inboxsdk/core/pageWorld.js',
+    background: '@inboxsdk/core/background.js'
   },
   output: {
     path: path.join(__dirname, "build"),
@@ -89,7 +91,7 @@ var options = {
 };
 
 if (env.NODE_ENV === "development") {
-  options.devtool = "cheap-module-eval-source-map";
+  options.devtool = "cheap-module-eval-source-map"; //In InboxSDK example this is inline-source-map, not sure if this matters
 }
 
 module.exports = options;

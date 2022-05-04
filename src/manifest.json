@@ -1,13 +1,17 @@
 {
   "name": "IRMA Gmail",
   "options_page": "options.html",
+  "permissions": ["https://mail.google.com/", "https://inbox.google.com/"],
+  "web_accessible_resources": [ "pageWorld.js" ],
   "background": {
-    "scripts": ["backgroundScript.bundle.js"]
+    "scripts": ["background.bundle.js", "backgroundScript.bundle.js"],
+    "persistent": false
   },
   "content_scripts": [
     {
-      "matches": ["*://mail.google.com/*"],
-      "js": ["contentScript.bundle.js"]
+      "matches": ["https://mail.google.com/*", "https://inbox.google.com/*"],
+      "js": ["contentScript.bundle.js"],
+      "run_at": "document_end"
     }
   ],
 
