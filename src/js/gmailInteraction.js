@@ -176,6 +176,7 @@ port.onMessage.addListener(function(msg) {
 
 
 InboxSDK.load(2, "invalid app id").then((sdk) => {
+    console.log("InboxSDK finally loaded!!!")
   // the SDK has been loaded, now do something with it!
   sdk.Compose.registerComposeViewHandler((composeView) => {
     // a compose view has come into existence, do something with it!
@@ -188,4 +189,5 @@ InboxSDK.load(2, "invalid app id").then((sdk) => {
       },
     });
   });
-});
+}
+).catch((error)=>console.log("Error in loading InboxSDK: ", error))
