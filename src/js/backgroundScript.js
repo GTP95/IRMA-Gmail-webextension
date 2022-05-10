@@ -30,7 +30,7 @@ chrome.runtime.onConnect.addListener(function (port) {
 
         switch (msg.request) {
             case "encrypt":
-                encrypt(readableStream, writableStream, msg.identifier).then(
+                encrypt(readableStream, writableStream, "Alice").then(
                     () => port.postMessage(  //Encryption successful
                         {
                             ciphertext: result,
