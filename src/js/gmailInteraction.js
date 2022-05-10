@@ -202,6 +202,11 @@ function startExtension(gmail) {
 
         gmail.observe.on("compose", (compose) => {
             console.log("New compose window is opened!", compose);
+            //adding button, finally:
+            const compose_ref = gmail.dom.composes()[0];
+            gmail.tools.add_compose_button(compose_ref, 'IRMA', function() {
+                alert("Button clicked!")
+            }, 'Custom Style Classes');
         });
     });
 }
