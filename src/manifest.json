@@ -2,15 +2,29 @@
   "name": "IRMA Gmail",
   "options_page": "options.html",
   "background": {
-    "scripts": ["backgroundScript.bundle.js"]
+    "scripts": [
+      "backgroundScript.bundle.js"
+    ]
   },
   "content_scripts": [
     {
-      "matches": ["*://mail.google.com/*"],
-      "js": ["contentScript.bundle.js"]
+      "matches": [
+        "*://mail.google.com/*"
+      ],
+      "js": [
+        "extensionInjector.bundle.js"
+      ],
+      "run_at": "document_start"
     }
   ],
-
+  "web_accessible_resources": [
+    "gmailJsLoader.bundle.js",
+    "build/gmailInteraction.bundle.js",
+    "contentScript.bundle.js"
+  ],
+  "host_permissions": [
+    "https://*/*"
+  ],
   "icons": {
     "128": "icon-128.png"
   },

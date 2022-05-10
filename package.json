@@ -30,6 +30,7 @@
     "@privacybydesign/irma-popup": "^0.4.3",
     "@types/chrome": "^0.0.180",
     "@types/inboxsdk": "^2.0.8",
+    "gmail-js": "^1.0.20",
     "typescript": "^4.6.3"
   }
 }
