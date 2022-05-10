@@ -205,7 +205,25 @@ function startExtension(gmail) {
             //adding button, finally:
             const compose_ref = gmail.dom.composes()[0];
             gmail.tools.add_compose_button(compose_ref, 'IRMA', function() {
-                alert("Button clicked!")
+
+                const emailRecipients=compose_ref.recipients() //I'm not getting how to specify options, working with this for now
+                const recipientsArray=[]
+                for(let recipient of emailRecipients['to']) recipientsArray.push(recipient)
+                for(let recipient of emailRecipients['cc']) recipientsArray.push(recipient)
+                for(let recipient of emailRecipients['bcc']) recipientsArray.push(recipient)
+
+                //And now extract the email address from each string (at this point those are in the format "name <email.addrss@domain.com>"
+                const recipientsAddressesArray=[]
+                let splittedArray
+                for(let recipient of recipientsArray){
+                    splittedArray=recipient.split(new RegExp("[<>]"))
+                    recipientsAddressesArray.push(splittedArray[1])
+                }
+                console.log("Email addresses: ", recipientsAddressesArray)
+
+                const emailBody=compose_ref.body()
+                const subject=compose_ref.subject()
+                console.log("Recipients: ", recipientsArray)
             }, 'Custom Style Classes');
         });
     });
