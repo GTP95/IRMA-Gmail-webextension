@@ -39,17 +39,19 @@ function createReadableStream(content){
  * Encrypt a ReadableStream into a WritableStream using IRMA
  * @param readable {ReadableStream}
  * @param writable {WritableStream}
- * @param identifier {String}
+ * @param identifier {Array<String>}
  * @returns {Promise<void>}
  */
 export async function encrypt(readable, writable, identifier) {
 // We provide the policies which we want to use for encryption.
-    const policies = {
-        [identifier]: {
+    const policies = identifier.reduce((total, recipient) => {
+        total[recipient] = {
             ts: Math.round(Date.now() / 1000),
-            con: [{ t: "irma-demo.gemeente.personalData.fullname", v: identifier }],
-        },
-    };
+            con: [{ t: "pbdf.sidn-pbdf.email.email", v: recipient }]
+        }
+        return total
+    }, {})
+
     console.log("Encrypting using policies: ", policies);
 
 // The following call reads data from a `ReadableStream` and seals it into `WritableStream`.

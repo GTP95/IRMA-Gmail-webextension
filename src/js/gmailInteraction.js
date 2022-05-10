@@ -9,7 +9,7 @@ import "gmail-js"
 
 console.log("ContentScript loaded")
 
-//let ciphertext, hiddenPolicies, identity="Alice"
+let ciphertext, hiddenPolicies, identity
 //
 //function ensureCiphertextIsSet(timeout){    //See https://codepen.io/eanbowman/pen/jxqKjJ for how this works
 //    const start=Date.now()
@@ -123,32 +123,32 @@ console.log("ContentScript loaded")
 //    }
 //}
 //
-//const port = chrome.runtime.connect({name: "crypto"});
-//
-//port.onMessage.addListener(function(msg) {
-//    console.log(msg)
-//    switch (msg.type){
-//
-//        case "ciphertext":
-//            ciphertext=msg.ciphertext //BEWARE: messaging messes up types, here we have an object, not an Uint8array!
-//            break
-//
-//        case "plaintext":
-//            console.log("Decrypted plaintext: ", msg.plaintext)
-//            break
-//
-//        case "hidden policies":
-//            hiddenPolicies=msg.content
-//            console.log(hiddenPolicies)
-//            break
-//
-//        case "error":
-//            console.log("Something went wrong, inspect message for clues")
-//            break
-//
-//        default: console.log("Generic messaging error, probably a typo in msg.type?")
-//    }
-//});
+const port = chrome.runtime.connect({name: "crypto"});
+
+port.onMessage.addListener(function(msg) {
+    console.log(msg)
+    switch (msg.type){
+
+        case "ciphertext":
+            ciphertext=msg.ciphertext //BEWARE: messaging messes up types, here we have an object, not an Uint8array!
+            break
+
+        case "plaintext":
+            console.log("Decrypted plaintext: ", msg.plaintext)
+            break
+
+        case "hidden policies":
+            hiddenPolicies=msg.content
+            console.log(hiddenPolicies)
+            break
+
+        case "error":
+            console.log("Something went wrong, inspect message for clues")
+            break
+
+        default: console.log("Generic messaging error, probably a typo in msg.type?")
+    }
+});
 //
 //port.postMessage(
 //    {
