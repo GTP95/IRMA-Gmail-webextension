@@ -4,12 +4,9 @@
 import {encrypt, decrypt, getHiddenPolicies} from "./crypto";
 
 
+chrome.runtime.onMessageExternal.addListener(
+    function (msg, sender, sendResponse) {
 
-
-
-chrome.runtime.onConnect.addListener(function (port) {
-    console.assert(port.name === "crypto");
-    port.onMessage.addListener(async function (msg) {
         let writableStream, readableStream, result;
         readableStream = new ReadableStream({
             start: (controller) => {
@@ -30,14 +27,14 @@ chrome.runtime.onConnect.addListener(function (port) {
 
         switch (msg.request) {
             case "encrypt":
-                encrypt(readableStream, writableStream, "Alice").then(
-                    () => port.postMessage(  //Encryption successful
+                encrypt(readableStream, writableStream, msg.identifiers).then(
+                    () => sendResponse(  //Encryption successful
                         {
                             ciphertext: result,
                             type: "ciphertext"
                         }
                     ),
-                    () => port.postMessage(
+                    () => sendResponse(
                         {
                             ciphertext: "NOT ENCRYPTED!",
                             type: "error"
@@ -48,7 +45,7 @@ chrome.runtime.onConnect.addListener(function (port) {
 
             case "decrypt":
                 //Temporary hack to test decryption of something I'm encrypting myself: reassign readableStream
-                let array=Uint8Array.from(Object.values(msg.content))  //Messaging messes up types, here I'm converting it back to the correct type: Uint8array
+                let array = Uint8Array.from(Object.values(msg.content))  //Messaging messes up types, here I'm converting it back to the correct type: Uint8array
                 console.log("type of ciphertext passed to unsealer: ", typeof array)
                 console.log("ciphertext passed to unsealer: ", array)
                 readableStream = new ReadableStream({
@@ -59,17 +56,17 @@ chrome.runtime.onConnect.addListener(function (port) {
                     },
                 });
                 decrypt(readableStream, writableStream, msg.usk, msg.identity).then(
-                    () =>{
-                        result=(new TextDecoder()).decode(result)
+                    () => {
+                        result = (new TextDecoder()).decode(result)
                         console.log("Decrypted plaintext: ", result)
-                        port.postMessage(   //Decryption successful
-                        {
-                            plaintext: result,
-                            type: "plaintext"
-                        }
-                    )
+                        sendResponse(   //Decryption successful
+                            {
+                                plaintext: result,
+                                type: "plaintext"
+                            }
+                        )
                     },
-                    () => port.postMessage(   //Decryption unsuccessful
+                    () => sendResponse(   //Decryption unsuccessful
                         {
                             plaintext: "NOT DECRYPTED!",
                             type: "error"
@@ -79,23 +76,24 @@ chrome.runtime.onConnect.addListener(function (port) {
                 break
 
             case "hidden policies":
-                let uint8array=Uint8Array.from(Object.values(msg.content))  //Messaging messes up types, here I'm converting it back to the correct type: Uint8array
+                let uint8array = Uint8Array.from(Object.values(msg.content))  //Messaging messes up types, here I'm converting it back to the correct type: Uint8array
                 getHiddenPolicies(uint8array).then(
-                    (hidden)=>port.postMessage(
+                    (hidden) => sendResponse(
                         {
                             content: hidden,
                             type: "hidden policies"
                         }
                     )
-                ).catch((err)=> {
+                ).catch((err) => {
 
                         console.log("Error in getting hidden policies: ", err)
                     }
                 )
 
         }
+    }
 
 
-    });
-});
+    )
+
 

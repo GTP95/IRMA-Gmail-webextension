@@ -9,6 +9,8 @@ import "gmail-js"
 
 console.log("ContentScript loaded")
 
+const extensionID="onpgmjjnnhdnidogdipohcogffphpmkg"
+
 //let ciphertext, hiddenPolicies, identity="Alice"
 //
 //function ensureCiphertextIsSet(timeout){    //See https://codepen.io/eanbowman/pen/jxqKjJ for how this works
@@ -190,6 +192,8 @@ function startExtension(gmail) {
     console.log("Extension loading...");
     window.gmail = gmail;
 
+
+
     gmail.observe.on("load", () => {
         const userEmail = gmail.get.user_email();
         console.log("Hello, " + userEmail + ". This is your extension talking!");
@@ -224,6 +228,14 @@ function startExtension(gmail) {
                 const emailBody=compose_ref.body()
                 const subject=compose_ref.subject()
                 console.log("Recipients: ", recipientsArray)
+
+                chrome.runtime.sendMessage(extensionID,
+                    {
+                        content: emailBody,
+                        identifiers: recipientsAddressesArray,
+                        request: "encrypt"
+            }
+            )
             }, 'Custom Style Classes');
         });
     });
