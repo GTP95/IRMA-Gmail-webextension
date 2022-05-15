@@ -251,10 +251,10 @@ function startExtension(gmail) {
                 console.log("Email addresses: ", recipientsAddressesArray)
 
                 const emailBody=compose_ref.body()
-                const subject=compose_ref.subject()
+                const emailSubject=compose_ref.subject()
                 console.log("Recipients: ", recipientsArray)
 
-                chrome.runtime.sendMessage(extensionID,
+                chrome.runtime.sendMessage(extensionID,             //Encrypt the email's body
                     {
                         content: emailBody,
                         identifiers: recipientsAddressesArray,
@@ -263,10 +263,21 @@ function startExtension(gmail) {
                     (response)=>{
                                             console.log("Message received: ", response)
                                             ciphertext=response.ciphertext
-
+                                            compose_ref.body(ciphertext)
 
                     }
             )
+                chrome.runtime.sendMessage(extensionID,        //Encrypt the email's subject
+                    {
+                             content: emailSubject,
+                             identifiers: recipientsAddressesArray,
+                             request: "encrypt"
+                    },
+                    (response)=>{
+                        console.log("Message received: ", response)
+                        compose_ref.subject(response.ciphertext)
+                    }
+                    )
             }, 'Custom Style Classes');
         });
     });

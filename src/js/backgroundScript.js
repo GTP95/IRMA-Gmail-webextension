@@ -3,6 +3,16 @@
 
 import {encrypt, decrypt, getHiddenPolicies} from "./crypto";
 
+function uint8ArrayToBase64(array ) {   //Code adapted from https://tutorial.eyehunts.com/js/byte-array-to-base64-javascript-examples-code/
+    var binary = '';
+    var bytes =  array;
+    var len = bytes.byteLength;
+    for (var i = 0; i < len; i++) {
+        binary += String.fromCharCode( bytes[ i ] );
+    }
+    return window.btoa( binary );
+
+}
 
 chrome.runtime.onMessageExternal.addListener(
     function (msg, sender, sendResponse) {
@@ -30,7 +40,7 @@ chrome.runtime.onMessageExternal.addListener(
                 encrypt(readableStream, writableStream, msg.identifiers).then(
                     () => sendResponse(  //Encryption successful
                         {
-                            ciphertext: result,
+                            ciphertext: uint8ArrayToBase64(result),
                             type: "ciphertext"
                         }
                     ),
