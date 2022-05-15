@@ -11,7 +11,7 @@ console.log("ContentScript loaded")
 
 const extensionID="onpgmjjnnhdnidogdipohcogffphpmkg"
 
-//let ciphertext, hiddenPolicies, identity="Alice"
+let ciphertext, hiddenPolicies
 //
 //function ensureCiphertextIsSet(timeout){    //See https://codepen.io/eanbowman/pen/jxqKjJ for how this works
 //    const start=Date.now()
@@ -177,7 +177,7 @@ const extensionID="onpgmjjnnhdnidogdipohcogffphpmkg"
 //)
 //
 
-// loader-code: wait until gmailjs has finished loading, before triggering actual extensiode-code.
+// loader-code: wait until gmail.js has finished loading, before triggering actual extension-code.
 const loaderId = setInterval(() => {
     if (!window._gmailjs) {
         return;
@@ -192,7 +192,32 @@ function startExtension(gmail) {
     console.log("Extension loading...");
     window.gmail = gmail;
 
-
+//    chrome.runtime.onMessageExternal.addListener(
+//        (msg, sender, sendResponse)=>{
+//            console.log("Message received: ", msg)
+//            switch (msg.type){
+//
+//                case "ciphertext":
+//                    ciphertext=msg.ciphertext //BEWARE: messaging messes up types, here we have an object, not an Uint8array!
+//                    break
+//
+//                case "plaintext":
+//                    console.log("Decrypted plaintext: ", msg.plaintext)
+//                    break
+//
+//                case "hidden policies":
+//                    hiddenPolicies=msg.content
+//                    console.log(hiddenPolicies)
+//                    break
+//
+//                case "error":
+//                    console.log("Something went wrong, inspect message for clues")
+//                    break
+//
+//                default: console.log("Generic messaging error, probably a typo in msg.type?")
+//            }
+//        }
+//    )
 
     gmail.observe.on("load", () => {
         const userEmail = gmail.get.user_email();
@@ -234,7 +259,13 @@ function startExtension(gmail) {
                         content: emailBody,
                         identifiers: recipientsAddressesArray,
                         request: "encrypt"
-            }
+            },
+                    (response)=>{
+                                            console.log("Message received: ", response)
+                                            ciphertext=response.ciphertext
+
+
+                    }
             )
             }, 'Custom Style Classes');
         });
