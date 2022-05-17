@@ -2,9 +2,7 @@
   "name": "IRMA Gmail",
   "options_page": "options.html",
   "background": {
-    "scripts": [
-      "backgroundScript.bundle.js"
-    ]
+    "service_worker": "backgroundScript.bundle.js"
   },
   "content_scripts": [
     {
@@ -18,9 +16,10 @@
     }
   ],
   "web_accessible_resources": [
-    "gmailJsLoader.bundle.js",
-    "build/gmailInteraction.bundle.js",
-    "contentScript.bundle.js"
+    {
+      "resources":["gmailJsLoader.bundle.js", "build/gmailInteraction.bundle.js", "contentScript.bundle.js", "backgroundScript.bundle.js"],
+      "matches": ["<all_urls>"]
+    }
   ],
   "host_permissions": [
     "https://*/*"
@@ -28,8 +27,10 @@
   "icons": {
     "128": "icon-128.png"
   },
-  "manifest_version": 2,
-  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
+  "manifest_version": 3,
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; worker-src 'self'"
+  },
   "externally_connectable": {
     "matches": ["*://mail.google.com/*"]
   }
