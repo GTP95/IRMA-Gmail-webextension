@@ -14,10 +14,10 @@ function uint8ArrayToBase64(array ) {   //Code adapted from https://tutorial.eye
 
 }
 
-chrome.runtime.onMessageExternal.addListener(
-    function (msg, sender, sendResponse) {
+window.addEventListener("message",
+    function (messageEvent) {
 
-        let writableStream, readableStream, result;
+        let writableStream, readableStream, result, msg=messageEvent.data
         readableStream = new ReadableStream({
             start: (controller) => {
                 const encoded = new TextEncoder().encode(msg.content);
@@ -38,13 +38,13 @@ chrome.runtime.onMessageExternal.addListener(
         switch (msg.request) {
             case "encrypt":
                 encrypt(readableStream, writableStream, msg.identifiers).then(
-                    () => sendResponse(  //Encryption successful
+                    () => window.postMessage(  //Encryption successful
                         {
                             ciphertext: uint8ArrayToBase64(result),
                             type: "ciphertext"
                         }
                     ),
-                    () => sendResponse(
+                    () => window.postMessage(
                         {
                             ciphertext: "NOT ENCRYPTED!",
                             type: "error"
@@ -69,14 +69,14 @@ chrome.runtime.onMessageExternal.addListener(
                     () => {
                         result = (new TextDecoder()).decode(result)
                         console.log("Decrypted plaintext: ", result)
-                        sendResponse(   //Decryption successful
+                        window.postMessage(   //Decryption successful
                             {
                                 plaintext: result,
                                 type: "plaintext"
                             }
                         )
                     },
-                    () => sendResponse(   //Decryption unsuccessful
+                    () => window.postMessage(   //Decryption unsuccessful
                         {
                             plaintext: "NOT DECRYPTED!",
                             type: "error"
@@ -88,7 +88,7 @@ chrome.runtime.onMessageExternal.addListener(
             case "hidden policies":
                 let uint8array = Uint8Array.from(Object.values(msg.content))  //Messaging messes up types, here I'm converting it back to the correct type: Uint8array
                 getHiddenPolicies(uint8array).then(
-                    (hidden) => sendResponse(
+                    (hidden) => window.postMessage(
                         {
                             content: hidden,
                             type: "hidden policies"

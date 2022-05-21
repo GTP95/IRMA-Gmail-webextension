@@ -254,29 +254,21 @@ function startExtension(gmail) {
                 const emailSubject=compose_ref.subject()
                 console.log("Recipients: ", recipientsArray)
 
-                chrome.runtime.sendMessage(extensionID,             //Encrypt the email's body
+                window.postMessage(            //Encrypt the email's body
                     {
                         content: emailBody,
                         identifiers: recipientsAddressesArray,
                         request: "encrypt"
             },
-                    (response)=>{
-                                            console.log("Message received: ", response)
-                                            ciphertext=response.ciphertext
-                                            compose_ref.body(ciphertext)
-
-                    }
+                    "*"
             )
-                chrome.runtime.sendMessage(extensionID,        //Encrypt the email's subject
+                window.postMessage(        //Encrypt the email's subject
                     {
                              content: emailSubject,
                              identifiers: recipientsAddressesArray,
                              request: "encrypt"
                     },
-                    (response)=>{
-                        console.log("Message received: ", response)
-                        compose_ref.subject(response.ciphertext)
-                    }
+                    "*"
                     )
             }, 'Custom Style Classes');
         });
