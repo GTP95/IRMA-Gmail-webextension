@@ -3,14 +3,14 @@
 
 import {encrypt, decrypt, getHiddenPolicies} from "./crypto";
 
-function uint8ArrayToBase64(array ) {   //Code adapted from https://tutorial.eyehunts.com/js/byte-array-to-base64-javascript-examples-code/
-    var binary = '';
-    var bytes =  array;
-    var len = bytes.byteLength;
-    for (var i = 0; i < len; i++) {
-        binary += String.fromCharCode( bytes[ i ] );
+function uint8ArrayToBase64(array) {   //Code adapted from https://tutorial.eyehunts.com/js/byte-array-to-base64-javascript-examples-code/
+    let binary = '';
+    const bytes = array;
+    const len = bytes.byteLength;
+    for (let i = 0; i < len; i++) {
+        binary += String.fromCharCode(bytes[i]);
     }
-    return window.btoa( binary );
+    return window.btoa(binary);
 
 }
 
@@ -102,8 +102,6 @@ chrome.runtime.onMessageExternal.addListener(
 
         }
     }
-
-
-    )
+)
 
 

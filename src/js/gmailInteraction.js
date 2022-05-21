@@ -1,4 +1,4 @@
-// @ts-check
+
 
 
 import * as IrmaCore from "@privacybydesign/irma-core";
