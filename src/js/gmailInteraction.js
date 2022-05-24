@@ -6,12 +6,14 @@ import * as IrmaClient from "@privacybydesign/irma-client";
 import * as IrmaPopup from "@privacybydesign/irma-popup";
 import "@privacybydesign/irma-css";
 import "gmail-js"
+import Worker from "./backgroundScript"
 
 console.log("ContentScript loaded")
 
 const extensionID="onpgmjjnnhdnidogdipohcogffphpmkg"
 
 let ciphertext, hiddenPolicies
+const worker=new Worker
 //
 //function ensureCiphertextIsSet(timeout){    //See https://codepen.io/eanbowman/pen/jxqKjJ for how this works
 //    const start=Date.now()
@@ -254,7 +256,7 @@ function startExtension(gmail) {
                 const emailSubject=compose_ref.subject()
                 console.log("Recipients: ", recipientsArray)
 
-                chrome.runtime.sendMessage(extensionID,             //Encrypt the email's body
+                worker.postMessage(             //Encrypt the email's body
                     {
                         content: emailBody,
                         identifiers: recipientsAddressesArray,
