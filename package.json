@@ -8,14 +8,14 @@
   },
   "devDependencies": {
     "clean-webpack-plugin": "4.x",
-    "copy-webpack-plugin": "6.4.0",
-    "css-loader": "5.x",
+    "copy-webpack-plugin": "11.x",
+    "css-loader": "6.x",
     "file-loader": "6.x",
     "fs-extra": "10.x",
     "html-loader": "3.x",
-    "html-webpack-plugin": "4.x",
-    "style-loader": "2.x",
-    "webpack": "4.x",
+    "html-webpack-plugin": "5.x",
+    "style-loader": "3.x",
+    "webpack": "^5.72.1",
     "webpack-cli": "4.x",
     "webpack-dev-server": "4.x",
     "write-file-webpack-plugin": "4.5.1"
@@ -32,7 +32,6 @@
     "@types/inboxsdk": "^2.0.8",
     "gmail-js": "^1.0.20",
     "jquery": "^3.6.0",
-    "typescript": "^4.6.3",
-    "worker-loader": "^3.0.8"
+    "typescript": "^4.6.3"
   }
 }
