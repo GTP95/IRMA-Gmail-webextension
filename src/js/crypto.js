@@ -8,12 +8,12 @@ import "@privacybydesign/irma-css";
 
 
 const url="https://main.irmaseal-pkg.ihub.ru.nl"
-let module, mpk;    //Need those as global variables to have the initialize function initialize them and then use them in other functions
+let irmasealModule, mpk;    //Need those as global variables to have the initialize function initialize them and then use them in other functions
 
 async function initialize(){
     // Load the WASM module.
-    module = await import("@e4a/irmaseal-wasm-bindings")
-    console.log(module)
+    irmasealModule = await import("@e4a/irmaseal-wasm-bindings")
+    console.log(irmasealModule)
 // Retrieve the public key from PKG API:
     const resp = await fetch(`${url}/v2/parameters`);
     mpk = await resp.json().then((r) => r.publicKey);
@@ -55,7 +55,7 @@ export async function encrypt(readable, writable, identifiers) {
 
 // The following call reads data from a `ReadableStream` and seals it into `WritableStream`.
 // Make sure that only chunks of type `Uint8Array` are enqueued to `readable`.
-    await module.seal(mpk, policies, readable, writable);
+    await irmasealModule.seal(mpk, policies, readable, writable);
 }
 
 /**
@@ -68,7 +68,7 @@ export async function encrypt(readable, writable, identifiers) {
 export async function decrypt(readable, writable, usk, identity) {
     try {
 
-        const unsealer = await module.Unsealer.new(readable);
+        const unsealer = await irmasealModule.Unsealer.new(readable);
         // Unseal the contents of the IRMAseal packet, writing the plaintext to a `WritableStream`.
         await unsealer.unseal(identity, usk, writable)
 
@@ -82,7 +82,7 @@ catch
 
     export async function getHiddenPolicies(ciphertext) {
         let unsealerReadable = createReadableStream(ciphertext)
-        let unsealer = await module.Unsealer.new(unsealerReadable);
+        let unsealer = await irmasealModule.Unsealer.new(unsealerReadable);
         const hidden = unsealer.get_hidden_policies();
         return hidden
     }
