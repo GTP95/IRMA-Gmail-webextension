@@ -1,8 +1,9 @@
 {
   "name": "IRMA Gmail",
+  "version":"1.0.0",
   "options_page": "options.html",
   "background": {
-    "service_worker": "backgroundScript.js"
+    "service_worker": "sw.js"
   },
   "content_scripts": [
     {
