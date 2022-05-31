@@ -42,7 +42,7 @@ function createReadableStream(content){
  * @param identifiers {Array<String>}
  * @returns {Promise<void>}
  */
-export async function encrypt(readable, writable, identifiers) {
+async function encrypt(readable, writable, identifiers) {
 // We provide the policies which we want to use for encryption.
     const policies = identifiers.reduce((total, recipient) => {
         total[recipient] = {
@@ -65,7 +65,7 @@ export async function encrypt(readable, writable, identifiers) {
  * @param usk {String}
  * @returns {Promise<void>} //It's just an empty promise... :D
  */
-export async function decrypt(readable, writable, usk, identity) {
+async function decrypt(readable, writable, usk, identity) {
     try {
 
         const unsealer = await irmasealModule.Unsealer.new(readable);
@@ -80,7 +80,7 @@ catch
 
 }
 
-    export async function getHiddenPolicies(ciphertext) {
+async function getHiddenPolicies(ciphertext) {
         let unsealerReadable = createReadableStream(ciphertext)
         let unsealer = await irmasealModule.Unsealer.new(unsealerReadable);
         const hidden = unsealer.get_hidden_policies();

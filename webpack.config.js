@@ -22,7 +22,7 @@ var options = {
   mode: process.env.NODE_ENV || "development",
   entry: {
     contentScript: path.join(__dirname, "src", "js", "gmailInteraction.js"),
-
+    sw: path.join(__dirname, "src", "js", "sw.js"),
     crypto: path.join(__dirname, "src", "js", "crypto.js"),
     gmailJsLoader: path.join(__dirname, "src", "js", "gmailJsLoader.js"),
     extensionInjector: path.join(__dirname, "src", "js", "extensionInjector.js")

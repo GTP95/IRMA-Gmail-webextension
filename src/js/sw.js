@@ -1,8 +1,7 @@
 // @ts-check
 
 
-import {encrypt, decrypt, getHiddenPolicies} from "./crypto";
-
+importScripts("crypto.bundle.js")
 function uint8ArrayToBase64(array) {   //Code adapted from https://tutorial.eyehunts.com/js/byte-array-to-base64-javascript-examples-code/
     let binary = '';
     const bytes = array;
