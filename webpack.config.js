@@ -22,7 +22,7 @@ var options = {
   mode: process.env.NODE_ENV || "development",
   entry: {
     contentScript: path.join(__dirname, "src", "js", "gmailInteraction.js"),
-    backgroundScript: path.join(__dirname, "src", "js", "backgroundScript.js"),
+
     crypto: path.join(__dirname, "src", "js", "crypto.js"),
     gmailJsLoader: path.join(__dirname, "src", "js", "gmailJsLoader.js"),
     extensionInjector: path.join(__dirname, "src", "js", "extensionInjector.js")
@@ -56,7 +56,7 @@ var options = {
   plugins: [
     // clean the build folder
     new CleanWebpackPlugin({
-      cleanStaleWebpackAssets: false
+      cleanStaleWebpackAssets: true
     }),
     // expose and write the allowed env vars on the compiled bundle
     new webpack.EnvironmentPlugin(["NODE_ENV"]),
