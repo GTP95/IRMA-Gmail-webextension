@@ -2,9 +2,6 @@
 
 
 import * as IrmaCore from "@privacybydesign/irma-core";
-//import * as IrmaClient from "@privacybydesign/irma-client";
-import * as IrmaPopup from "@privacybydesign/irma-popup";
-import "@privacybydesign/irma-css";
 import "@e4a/irmaseal-wasm-bindings"
 
 

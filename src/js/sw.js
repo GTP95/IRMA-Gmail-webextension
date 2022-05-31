@@ -1,9 +1,9 @@
 // @ts-check
 
-//Maybe I don't even need to load the workbox libraries, but leaving the there for now
+//Maybe I don't even need to load the workbox libraries, but leaving them there for now
 import 'workbox-core'
 import 'workbox-window'
-
+import {encrypt, decrypt, getHiddenPolicies} from "./crypto";
 
 function uint8ArrayToBase64(array) {   //Code adapted from https://tutorial.eyehunts.com/js/byte-array-to-base64-javascript-examples-code/
     let binary = '';

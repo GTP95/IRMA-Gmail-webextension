@@ -6,7 +6,7 @@ import * as IrmaCore from "@privacybydesign/irma-core";
 import * as IrmaPopup from "@privacybydesign/irma-popup";
 import "@privacybydesign/irma-css";
 import "gmail-js"
-import Worker from "./sw"
+
 
 console.log("ContentScript loaded")
 
