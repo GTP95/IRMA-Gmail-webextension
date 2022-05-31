@@ -2,7 +2,7 @@
   "name": "IRMA Gmail",
   "options_page": "options.html",
   "background": {
-    "service_worker": "backgroundScript.bundle.js"
+    "service_worker": "backgroundScript.js"
   },
   "content_scripts": [
     {
@@ -10,14 +10,14 @@
         "*://mail.google.com/*"
       ],
       "js": [
-        "extensionInjector.bundle.js"
+        "extensionInjector.js"
       ],
       "run_at": "document_start"
     }
   ],
   "web_accessible_resources": [
     {
-      "resources":["gmailJsLoader.bundle.js", "build/gmailInteraction.bundle.js", "contentScript.bundle.js", "backgroundScript.bundle.js"],
+      "resources":["gmailJsLoader.js", "build/gmailInteraction.js", "contentScript.js", "backgroundScript.js"],
       "matches": ["<all_urls>"]
     }
   ],
