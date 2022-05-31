@@ -12,9 +12,6 @@ const url="https://main.irmaseal-pkg.ihub.ru.nl"
 let irmasealModule, mpk;    //Need those as global variables to have the initialize function initialize them and then use them in other functions
 
 async function initialize(){
-    // Load the WASM module.
-    irmasealModule = await import("@e4a/irmaseal-wasm-bindings")
-    console.log(irmasealModule)
 // Retrieve the public key from PKG API:
     const resp = await fetch(`${url}/v2/parameters`);
     mpk = await resp.json().then((r) => r.publicKey);
@@ -88,4 +85,4 @@ export async function getHiddenPolicies(ciphertext) {
         return hidden
     }
 
-//initialize().then(() => console.log("Crypto module initialized"));
+initialize().then(() => console.log("Crypto module initialized"));

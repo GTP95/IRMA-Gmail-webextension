@@ -48,7 +48,7 @@ Let's say that you want use the `myContentScript` entry point as content script,
 {
   …
   entry: {
-    myContentScript: "./src/js/myContentScript.js"
+    myContentScript: "./src/scripts/myContentScript.scripts"
   },
   chromeExtensionBoilerplate: {
     notHotReload: ["myContentScript"]
@@ -64,7 +64,7 @@ and on your `src/manifest.json`:
   "content_scripts": [
     {
       "matches": ["https://www.google.com/*"],
-      "js": ["myContentScript.bundle.js"]
+      "js": ["myContentScript.bundle.scripts"]
     }
   ]
 }

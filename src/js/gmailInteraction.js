@@ -2,7 +2,7 @@
 
 
 import * as IrmaCore from "@privacybydesign/irma-core";
-import * as IrmaClient from "@privacybydesign/irma-client";
+//import * as IrmaClient from "@privacybydesign/irma-client";
 import * as IrmaPopup from "@privacybydesign/irma-popup";
 import "@privacybydesign/irma-css";
 import "gmail-js"
@@ -13,7 +13,7 @@ console.log("ContentScript loaded")
 const extensionID="onpgmjjnnhdnidogdipohcogffphpmkg"
 
 let ciphertext, hiddenPolicies
-const worker=new Worker
+
 //
 //function ensureCiphertextIsSet(timeout){    //See https://codepen.io/eanbowman/pen/jxqKjJ for how this works
 //    const start=Date.now()

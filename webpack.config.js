@@ -21,7 +21,7 @@ if (fileSystem.existsSync(secretsPath)) {
 var options = {
   mode: process.env.NODE_ENV || "development",
   entry: {
-    contentScript: path.join(__dirname, "src", "js", "gmailInteraction.js"),
+    gmailInteraction: path.join(__dirname, "src", "js", "gmailInteraction.js"), //Kind of a ContentScript, but gets injected into the web interface
     sw: path.join(__dirname, "src", "js", "sw.js"),
     crypto: path.join(__dirname, "src", "js", "crypto.js"),
     gmailJsLoader: path.join(__dirname, "src", "js", "gmailJsLoader.js"),
