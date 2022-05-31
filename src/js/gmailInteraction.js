@@ -256,19 +256,18 @@ function startExtension(gmail) {
                 const emailSubject=compose_ref.subject()
                 console.log("Recipients: ", recipientsArray)
 
-                worker.postMessage(             //Encrypt the email's body
+                runtime.sendMessage(extensionID,             //Encrypt the email's body
                     {
                         content: emailBody,
                         identifiers: recipientsAddressesArray,
                         request: "encrypt"
-            },
-                    (response)=>{
-                                            console.log("Message received: ", response)
-                                            ciphertext=response.ciphertext
-                                            compose_ref.body(ciphertext)
+            }
+            ).then((response)=>{
+                    console.log("Message received: ", response)
+                    ciphertext=response.ciphertext
+                    compose_ref.body(ciphertext)
 
-                    }
-            )
+                })
                 chrome.runtime.sendMessage(extensionID,        //Encrypt the email's subject
                     {
                              content: emailSubject,
