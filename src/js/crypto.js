@@ -5,6 +5,7 @@ import * as IrmaCore from "@privacybydesign/irma-core";
 //import * as IrmaClient from "@privacybydesign/irma-client";
 import * as IrmaPopup from "@privacybydesign/irma-popup";
 import "@privacybydesign/irma-css";
+import "@e4a/irmaseal-wasm-bindings"
 
 
 const url="https://main.irmaseal-pkg.ihub.ru.nl"
@@ -42,7 +43,7 @@ function createReadableStream(content){
  * @param identifiers {Array<String>}
  * @returns {Promise<void>}
  */
-async function encrypt(readable, writable, identifiers) {
+export async function encrypt(readable, writable, identifiers) {
 // We provide the policies which we want to use for encryption.
     const policies = identifiers.reduce((total, recipient) => {
         total[recipient] = {
@@ -65,7 +66,7 @@ async function encrypt(readable, writable, identifiers) {
  * @param usk {String}
  * @returns {Promise<void>} //It's just an empty promise... :D
  */
-async function decrypt(readable, writable, usk, identity) {
+export async function decrypt(readable, writable, usk, identity) {
     try {
 
         const unsealer = await irmasealModule.Unsealer.new(readable);
@@ -80,11 +81,11 @@ catch
 
 }
 
-async function getHiddenPolicies(ciphertext) {
+export async function getHiddenPolicies(ciphertext) {
         let unsealerReadable = createReadableStream(ciphertext)
         let unsealer = await irmasealModule.Unsealer.new(unsealerReadable);
         const hidden = unsealer.get_hidden_policies();
         return hidden
     }
 
-initialize().then(() => console.log("Crypto module initialized"));
+//initialize().then(() => console.log("Crypto module initialized"));

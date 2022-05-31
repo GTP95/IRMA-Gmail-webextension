@@ -3,7 +3,7 @@
 //Maybe I don't even need to load the workbox libraries, but leaving the there for now
 import 'workbox-core'
 import 'workbox-window'
-importScripts("crypto.js")
+
 
 function uint8ArrayToBase64(array) {   //Code adapted from https://tutorial.eyehunts.com/js/byte-array-to-base64-javascript-examples-code/
     let binary = '';
