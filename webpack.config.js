@@ -63,7 +63,7 @@ var options = {
     new CopyWebpackPlugin(
         {
           patterns: [
-            { from: "src/manifest.json", to: "build" }
+            { from: "src/manifest.json", to: "." }
 
           ],
         }
