@@ -127,39 +127,9 @@ let ciphertext, hiddenPolicies
 //    }
 //}
 //
-//const port = chrome.runtime.connect({name: "crypto"});
-//
-//port.onMessage.addListener(function(msg) {
-//    console.log(msg)
-//    switch (msg.type){
-//
-//        case "ciphertext":
-//            ciphertext=msg.ciphertext //BEWARE: messaging messes up types, here we have an object, not an Uint8array!
-//            break
-//
-//        case "plaintext":
-//            console.log("Decrypted plaintext: ", msg.plaintext)
-//            break
-//
-//        case "hidden policies":
-//            hiddenPolicies=msg.content
-//            console.log(hiddenPolicies)
-//            break
-//
-//        case "error":
-//            console.log("Something went wrong, inspect message for clues")
-//            break
-//
-//        default: console.log("Generic messaging error, probably a typo in msg.type?")
-//    }
-//});
-//
-//port.postMessage(
-//    {
-//        content: "Knock knock",
-//        request: "encrypt"
-//    }
-//);
+
+
+
 //
 //ensureCiphertextIsSet(5000).then(
 //    (ciphertext)=>askForDecryption(ciphertext).then(
@@ -221,6 +191,8 @@ function startExtension(gmail) {
 //        }
 //    )
 
+
+
     gmail.observe.on("load", () => {
         const userEmail = gmail.get.user_email();
         console.log("Hello, " + userEmail + ". This is your extension talking!");
@@ -232,6 +204,7 @@ function startExtension(gmail) {
         });
 
         gmail.observe.on("compose", (compose) => {
+
             console.log("New compose window is opened!", compose);
             //adding button, finally:
             const compose_ref = gmail.dom.composes()[0];
@@ -256,30 +229,54 @@ function startExtension(gmail) {
                 const emailSubject=compose_ref.subject()
                 console.log("Recipients: ", recipientsArray)
 
-                runtime.sendMessage(extensionID,             //Encrypt the email's body
+                chrome.runtime.sendMessage(extensionID,             //Encrypt the email's body
                     {
                         content: emailBody,
                         identifiers: recipientsAddressesArray,
                         request: "encrypt"
-            }
-            ).then((response)=>{
-                    console.log("Message received: ", response)
-                    ciphertext=response.ciphertext
-                    compose_ref.body(ciphertext)
-
-                })
+            }, (response)=>console.log("Got response: ", response)
+            )
                 chrome.runtime.sendMessage(extensionID,        //Encrypt the email's subject
                     {
                              content: emailSubject,
                              identifiers: recipientsAddressesArray,
                              request: "encrypt"
-                    },
-                    (response)=>{
-                        console.log("Message received: ", response)
-                        compose_ref.subject(response.ciphertext)
-                    }
+                    }, (response)=>console.log("Got response: ", response)
                     )
             }, 'Custom Style Classes');
         });
     });
 }
+
+
+//port.onMessage.addListener(function(msg) {
+//    console.log(msg)
+//    switch (msg.type){
+//
+//        case "ciphertext":
+//            ciphertext=msg.ciphertext //BEWARE: messaging messes up types, here we have an object, not an Uint8array!
+//            break
+//
+//        case "plaintext":
+//            console.log("Decrypted plaintext: ", msg.plaintext)
+//            break
+//
+//        case "hidden policies":
+//            hiddenPolicies=msg.content
+//            console.log(hiddenPolicies)
+//            break
+//
+//        case "error":
+//            console.log("Something went wrong, inspect message for clues")
+//            break
+//
+//        default: console.log("Generic messaging error, probably a typo in msg.type?")
+//    }
+//});
+//
+//port.postMessage(
+//    {
+//        content: "Knock knock",
+//        request: "encrypt"
+//    }
+//);
