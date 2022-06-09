@@ -1,8 +1,8 @@
-# Chrome Extension Webpack Boilerplate
+# IRMA Gmail webextension
 
-A basic foundation boilerplate for rich Chrome Extensions using [Webpack](https://webpack.github.io/) to help you write modular and modern Javascript code, load CSS easily and [automatic reload the browser on code changes](https://webpack.github.io/docs/webpack-dev-server.html#automatic-refresh).
+A browser extension to encrypt your emails using IRMA. Currently only Chromium and Chrome are supported, but support for other browsers will come soon
 
-## Developing a new extension
+## Development
 _I'll assume that you already read the [Webpack docs](https://webpack.js.org) and the [Chrome Extension](https://developer.chrome.com/extensions/getstarted) docs._
 
 
