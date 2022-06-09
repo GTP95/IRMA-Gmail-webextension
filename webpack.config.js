@@ -20,6 +20,11 @@ if (fileSystem.existsSync(secretsPath)) {
 
 var options = {
   mode: process.env.NODE_ENV || "development",
+
+  experiments: {
+    syncWebAssembly: true,
+    asyncWebAssembly: true
+  },
   entry: {
     gmailInteraction: path.join(__dirname, "src", "js", "gmailInteraction.js"), //Kind of a ContentScript, but gets injected into the web interface
     sw: path.join(__dirname, "src", "js", "sw.js"),

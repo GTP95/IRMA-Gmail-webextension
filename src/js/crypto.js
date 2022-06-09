@@ -2,7 +2,7 @@
 
 
 import * as IrmaCore from "@privacybydesign/irma-core";
-import "@e4a/irmaseal-wasm-bindings"
+import { seal, Unsealer } from "@e4a/irmaseal-wasm-bindings";
 
 
 const url="https://main.irmaseal-pkg.ihub.ru.nl"
@@ -50,7 +50,7 @@ export async function encrypt(readable, writable, identifiers) {
 
 // The following call reads data from a `ReadableStream` and seals it into `WritableStream`.
 // Make sure that only chunks of type `Uint8Array` are enqueued to `readable`.
-    await irmasealModule.seal(mpk, policies, readable, writable);
+    await seal(mpk, policies, readable, writable);
 }
 
 /**
@@ -63,7 +63,7 @@ export async function encrypt(readable, writable, identifiers) {
 export async function decrypt(readable, writable, usk, identity) {
     try {
 
-        const unsealer = await irmasealModule.Unsealer.new(readable);
+        const unsealer = await Unsealer.new(readable);
         // Unseal the contents of the IRMAseal packet, writing the plaintext to a `WritableStream`.
         await unsealer.unseal(identity, usk, writable)
 
@@ -77,7 +77,7 @@ catch
 
 export async function getHiddenPolicies(ciphertext) {
         let unsealerReadable = createReadableStream(ciphertext)
-        let unsealer = await irmasealModule.Unsealer.new(unsealerReadable);
+        let unsealer = await Unsealer.new(unsealerReadable);
         const hidden = unsealer.get_hidden_policies();
         return hidden
     }

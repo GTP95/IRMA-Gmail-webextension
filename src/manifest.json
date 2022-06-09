@@ -30,7 +30,7 @@
   },
   "manifest_version": 3,
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'; worker-src 'self'"
+    "extension_pages": "script-src 'self'; object-src 'self'; worker-src 'self'; wasm-unsafe-eval"
   },
   "externally_connectable": {
     "matches": ["*://mail.google.com/*"]
