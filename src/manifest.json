@@ -18,7 +18,7 @@
   ],
   "web_accessible_resources": [
     {
-      "resources":["gmailJsLoader.js", "gmailInteraction.js", "contentScript.js", "extensionInjector.js", "extensionInjector.js.map", "gmailJsLoader.js.map", "gmailInteraction.js.map"],
+      "resources":["gmailJsLoader.js", "gmailInteraction.js", "contentScript.js", "extensionInjector.js", "extensionInjector.js.map", "gmailJsLoader.js.map", "gmailInteraction.js.map", "@e4a/irmaseal-wasm-bindings"],
       "matches": ["<all_urls>"]
     }
   ],
@@ -30,7 +30,7 @@
   },
   "manifest_version": 3,
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self'; worker-src 'self'; wasm-unsafe-eval"
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
   },
   "externally_connectable": {
     "matches": ["*://mail.google.com/*"]
