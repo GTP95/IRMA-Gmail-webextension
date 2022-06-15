@@ -1,4 +1,4 @@
-
+//@ts-check
 
 
 import * as IrmaCore from "@privacybydesign/irma-core";
@@ -6,6 +6,9 @@ import * as IrmaCore from "@privacybydesign/irma-core";
 import * as IrmaPopup from "@privacybydesign/irma-popup";
 import "@privacybydesign/irma-css";
 import "gmail-js"
+import {createMimeMessage} from 'mimetext'
+import "@e4a/irmaseal-mail-utils"
+import {ComposeMail} from "@e4a/irmaseal-mail-utils";
 
 
 console.log("ContentScript loaded")
@@ -17,17 +20,20 @@ let ciphertext, hiddenPolicies
 
 // loader-code: wait until gmail.js has finished loading, before triggering actual extension-code.
 const loaderId = setInterval(() => {
+    // @ts-ignore
     if (!window._gmailjs) {
         return;
     }
 
     clearInterval(loaderId);
+    // @ts-ignore
     startExtension(window._gmailjs);
 }, 100);
 
 // actual extension-code
 function startExtension(gmail) {
     console.log("Extension loading...");
+    // @ts-ignore
     window.gmail = gmail;
 
     gmail.observe.on("load", () => {
@@ -66,20 +72,51 @@ function startExtension(gmail) {
                 const emailSubject=compose_ref.subject()
                 console.log("Recipients: ", recipientsArray)
 
-                chrome.runtime.sendMessage(extensionID,             //Encrypt the email's body
+                //create a mime object representing the email
+                const msg=createMimeMessage()
+
+                msg.setSender(userEmail)    //I have to duplicate some information for compatibility with the other addons
+                msg.setRecipients(recipientsAddressesArray)
+                msg.setSubject(compose_ref.subject())
+                msg.setMessage('text/plain', compose_ref.body())    //Maybe also works without specifying the type, but body() returns a string anyway
+
+                //Now send this constructed message to the service worker for encryption
+                chrome.runtime.sendMessage(extensionID,
                     {
-                        content: emailBody,
+                        content: msg.asRaw(),
                         identifiers: recipientsAddressesArray,
                         request: "encrypt"
-            }, (response)=>compose_ref.body(response.ciphertext)
-            )
-                chrome.runtime.sendMessage(extensionID,        //Encrypt the email's subject
-                    {
-                             content: emailSubject,
-                             identifiers: recipientsAddressesArray,
-                             request: "encrypt"
-                    }, (response)=>compose_ref.subject(response.ciphertext)
+                    }, (response)=>{
+                        console.log("Encrypted email: ", response.ciphertext)
+
+                        //and now use irmaseal-mail-utils to construct the final message for compatibility with other addons
+                        const composeMail=new ComposeMail()
+                        composeMail.setSender(userEmail)
+                        for(let recipient of emailRecipients['to']) composeMail.addRecipient(recipient)
+                        for(let recipient of emailRecipients['cc']) composeMail.addCcRecipient(recipient)
+                        for(let recipient of emailRecipients['bcc']) composeMail.addBccRecipient(recipient)
+                        composeMail.setSubject("IRMA encrypted email")
+                        composeMail.setPayload(new Uint8Array(response.ciphertext)) //This expects an array-like object, if I don't construct an array here we get just an object
+                        const finalMimeObjectToSend=composeMail.getMimeMail()
+
+
+
+                        //And finally the fun part: try to add this as an attachment. For this, I use the hack suggested here: https://github.com/KartikTalwar/gmail.js/issues/635#issuecomment-808770417
+
+                        const fileInput=compose.$el.find('[type=file]')[0]
+                        const file=new File([finalMimeObjectToSend], "attachedIRMAmail")
+                        const dt=new DataTransfer()
+                        dt.items.add(file)
+                        fileInput.files=dt.files
+                        const evt=document.createEvent('HTMLEvents')
+                        evt.initEvent('change', false, true)
+                        fileInput.dispatchEvent(evt)
+
+
+                    }
+
                     )
+
             }, 'Custom Style Classes');
         });
     });

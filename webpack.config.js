@@ -88,7 +88,11 @@ var options = {
       filename: "background.html",
       chunks: ["background"]
     }),
-    new WriteFilePlugin()
+    new WriteFilePlugin(),
+    new webpack.ProvidePlugin({ //needed for the irmaseal-mail-utils, otherwise we get an error about Buffer not being defined
+      process: "process/browser",
+      Buffer: ["buffer", "Buffer"],
+    })
   ]
 };
 
