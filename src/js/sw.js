@@ -34,8 +34,10 @@ chrome.runtime.onMessageExternal.addListener((msg, sender, sendResponse) => {
         case "encrypt":
             encrypt(readableStream, writableStream, msg.identifiers).then(() => sendResponse(  //Encryption successful
                 {
-                    ciphertext: result, type: "ciphertext"
-                })).catch((error) => sendResponse({
+                    ciphertext: uint8ArrayToBase64(result),
+                    type: "ciphertext"
+                }
+                )).catch((error) => sendResponse({
                 ciphertext: "Error: "+error, type: "error"
             }))
             break

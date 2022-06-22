@@ -10,10 +10,14 @@ import {createMimeMessage} from 'mimetext'
 import "@e4a/irmaseal-mail-utils"
 import {ComposeMail} from "@e4a/irmaseal-mail-utils";
 
-
 console.log("ContentScript loaded")
 
 const extensionID="onpgmjjnnhdnidogdipohcogffphpmkg"
+const header="Content-Type: application/postguard;\n" +
+    "name=\"postguard.encrypted\"\n" +
+    "Content-Transfer-Encoding: base64\"\n"
+const subject="PostGuard encrypted email"
+
 
 let ciphertext, hiddenPolicies
 
@@ -89,17 +93,43 @@ function startExtension(gmail) {
                     }, (response)=>{
                         console.log("Encrypted email: ", response.ciphertext)
 
-                        //and now use irmaseal-mail-utils to construct the final message for compatibility with other addons
-                        const composeMail=new ComposeMail()
-                        composeMail.setSender(userEmail)
-                        for(let recipient of emailRecipients['to']) composeMail.addRecipient(recipient)
-                        for(let recipient of emailRecipients['cc']) composeMail.addCcRecipient(recipient)
-                        for(let recipient of emailRecipients['bcc']) composeMail.addBccRecipient(recipient)
-                        composeMail.setSubject("IRMA encrypted email")
-                        composeMail.setPayload(new Uint8Array(response.ciphertext)) //This expects an array-like object, if I don't construct an array here we get just an object
-                        const finalMimeObjectToSend=composeMail.getMimeMail()
+                        //Now construct a string with the correct format for compatibility with other IRMA addons
+                        let finalMimeObjectToSend=header+response.ciphertext
+                        console.log("mime body: ", finalMimeObjectToSend)
 
+                        //Replace subject and body of the email with text explaining this is an IRMA encrypted email
+                        const body="You received a PostGuard encrypted email from " + userEmail + "\n" +
+                            "There are four ways to read this protected email:\n" +
+                            "1) If you use Outlook and have already installed PostGuard, click on the \"Decrypt Email\"-button. \n" +
+                            "This button can be found on the right side of the ribbon above.\n" +
+                            "2) You can decrypt and read this email via https://www.postguard.eu/decrypt/.\n" +
+                            "This website can only decrypt emails.\n" +
+                            "3) You can install the free PostGuard addon in your own mail client.\n" +
+                            "This works for Outlook and Thunderbird.\n" +
+                            "4) You can install the free postGuard extension in your own browser and use Gmail's webmail+\n" +
+                            "Download PostGuard via: https://www.postguard.eu\n" +
+                            "After installation, you can not only decrypt and read emails but also all future Postguarded emails. \n" +
+                            "Moreover, you can easily send and receive secure emails with the PostGuard addon within your email client.\n" +
+                            "\n" +
+                            "What is PostGuard?\n" +
+                            "\n" +
+                            "PostGuard is a service for secure emailing. Only the intended recipient(s) can decrypt\n" +
+                            "and read the emails sent with PostGuard. \n" +
+                            "The \"Encryption for all\"-team of the Radboud University has developed PostGuard.\n" +
+                            "PostGuard uses the IRMA app for authentication. \n" +
+                            "More information via: https://www.postguard.eu\n" +
+                            "\n" +
+                            "What is the IRMA app?\n" +
+                            "\n" +
+                            "When you receive a PostGuarded email, you need to use the IRMA app to prove that you\n" +
+                            "really are the intended recipient of the email.\n" +
+                            "IRMA is a separate privacy-friendly authentication app\n" +
+                            "(which is used also for other authentication purposes).\n" +
+                            "The free IMRA app can be downloaded via the App Store and Play Store.\n" +
+                            "More information via: https://irma.app"
 
+                        compose_ref.subject(subject)
+                        compose_ref.body(body)
 
                         //And finally the fun part: try to add this as an attachment. For this, I use the hack suggested here: https://github.com/KartikTalwar/gmail.js/issues/635#issuecomment-808770417
 
