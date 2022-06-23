@@ -13,9 +13,9 @@ import {ComposeMail} from "@e4a/irmaseal-mail-utils";
 console.log("ContentScript loaded")
 
 const extensionID="onpgmjjnnhdnidogdipohcogffphpmkg"
-const header="Content-Type: application/postguard;\n" +
-    "name=\"postguard.encrypted\"\n" +
-    "Content-Transfer-Encoding: base64\"\n"
+const header="Content-Type: application/postguard;\r\n" +
+    "name=\"postguard.encrypted\"\r\n" +
+    'Content-Transfer-Encoding: "base64"\r\n'
 const subject="PostGuard encrypted email"
 
 
@@ -63,12 +63,15 @@ function startExtension(gmail) {
                 for(let recipient of emailRecipients['cc']) recipientsArray.push(recipient)
                 for(let recipient of emailRecipients['bcc']) recipientsArray.push(recipient)
 
-                //And now extract the email address from each string (at this point those are in the format "name <email.addrss@domain.com>"
+                //And now extract the email address from each string (at this point those are in the format "name <email.addrss@domain.com>", but only if they already are in the address book! That's why I need an if later to check the format
                 const recipientsAddressesArray=[]
                 let splittedArray
                 for(let recipient of recipientsArray){
-                    splittedArray=recipient.split(new RegExp("[<>]"))
-                    recipientsAddressesArray.push(splittedArray[1])
+                    if(recipient.includes('<') && recipient.includes('>')) { //Dirty hack to detect the address' format, see previous comment    TODO: this could be probably made better by lloking for a method that properly extracts the email address or trying with a regex
+                        splittedArray = recipient.split(new RegExp("[<>]"))
+                        recipientsAddressesArray.push(splittedArray[1])
+                    }
+                    else recipientsAddressesArray.push(recipient)   //If the condition is false, the email address is already in the correct form. All of this assuming nobody has bot '<' and '>' in their address...
                 }
                 console.log("Email addresses: ", recipientsAddressesArray)
 
@@ -95,7 +98,7 @@ function startExtension(gmail) {
 
                         //Now construct a string with the correct format for compatibility with other IRMA addons
                         let finalMimeObjectToSend=header+response.ciphertext
-                        console.log("mime body: ", finalMimeObjectToSend)
+                        console.log("Final MIME object to send:\n", finalMimeObjectToSend)
 
                         //Replace subject and body of the email with text explaining this is an IRMA encrypted email
                         const body="You received a PostGuard encrypted email from " + userEmail + "\n" +
@@ -134,7 +137,7 @@ function startExtension(gmail) {
                         //And finally the fun part: try to add this as an attachment. For this, I use the hack suggested here: https://github.com/KartikTalwar/gmail.js/issues/635#issuecomment-808770417
 
                         const fileInput=compose.$el.find('[type=file]')[0]
-                        const file=new File([finalMimeObjectToSend], "attachedIRMAmail")
+                        const file=new File([finalMimeObjectToSend], "postguard.encrypted")
                         const dt=new DataTransfer()
                         dt.items.add(file)
                         fileInput.files=dt.files
