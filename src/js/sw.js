@@ -68,7 +68,7 @@ chrome.runtime.onMessageExternal.addListener((msg, sender, sendResponse) => {
             break
 
         case "hidden policies":
-            let uint8array = Uint8Array.from(Object.values(msg.content))  //Messaging messes up types, here I'm converting it back to the correct type: Uint8array
+            let uint8array = base64ToUInt8Array(msg.content)  //Messaging messes up types, here I'm converting it back to the correct type: Uint8array
             getHiddenPolicies(uint8array).then((hidden) => sendResponse({
                 content: hidden, type: "hidden policies"
             })).catch((err) => {
@@ -95,6 +95,23 @@ function uint8ArrayToBase64(array) {
     }
     return btoa(binary);
 
+}
+
+/**
+ * Converts a base64-encoded string to it's UInt8Array equivalent
+ * Adapted from here: https://stackoverflow.com/questions/21797299/convert-base64-string-to-arraybuffer
+ * @param base64
+ * @returns {ArrayBufferLike}
+ * @private
+ */
+function base64ToUInt8Array(base64) {
+    var binary_string = atob(base64);
+    var len = binary_string.length;
+    var bytes = new Uint8Array(len);
+    for (var i = 0; i < len; i++) {
+        bytes[i] = binary_string.charCodeAt(i);
+    }
+    return bytes.buffer;
 }
 
 console.log("Service worker started!")

@@ -2,12 +2,11 @@
 
 
 import * as IrmaCore from "@privacybydesign/irma-core";
-//import * as IrmaClient from "@privacybydesign/irma-client";
+//  import * as IrmaClient from "@privacybydesign/irma-client";
 import * as IrmaPopup from "@privacybydesign/irma-popup";
 import "@privacybydesign/irma-css";
 import "gmail-js"
 import {createMimeMessage} from 'mimetext'
-import "@e4a/irmaseal-mail-utils"
 import {ComposeMail} from "@e4a/irmaseal-mail-utils";
 
 console.log("ContentScript loaded")
@@ -17,10 +16,87 @@ const header="Content-Type: application/postguard;\r\n" +
     "name=\"postguard.encrypted\"\r\n" +
     'Content-Transfer-Encoding: "base64"\r\n'
 const subject="PostGuard encrypted email"
-
+const pkg = "https://main.irmaseal-pkg.ihub.ru.nl"
 
 let ciphertext, hiddenPolicies
 
+/**
+ * Message passing messes up with types (I get a "generic" object instead of an array) plus the UInt8Array.from() method
+ * fails silently when I try to use it to convert the object back to an Uint8Array. So I have to use the following.
+ * @param object {Object}
+ * @returns {Uint8Array}
+ */
+function objectToUInt8array(object){
+   return Uint8Array.from(Object.values(object))
+}
+
+function requestDecryption(extensionID, message, identity){
+    //First we need to get the hidden policies. Why they play hide-and-seek, is still debated
+    chrome.runtime.sendMessage(extensionID,
+        {
+            content: message,
+            request: "hidden policies"
+        }, async (response) => {
+            const hidden = response.content
+            const keyRequest = {
+                con: [{t: "irma-demo.gemeente.personalData.fullname", v: identity}],
+                validity: 600, // 1 minute
+            }
+            const timestamp = hidden[identity].ts;
+            const session = {
+                url: pkg,
+                start: {
+                    url: (o) => `${o.url}/v2/request/start`,
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify(keyRequest),
+                },
+                mapping: {
+                    // temporary fix
+                    sessionPtr: (r) => {
+                        const ptr = r.sessionPtr;
+                        ptr.u = `https://ihub.ru.nl/irma/1/${ptr.u}`;
+                        return ptr;
+                    },
+                },
+                result: {
+                    url: (o, {sessionToken}) => `${o.url}/v2/request/jwt/${sessionToken}`,
+                    parseResponse: (r) => {
+                        return r
+                            .text()
+                            .then((jwt) =>
+                                fetch(`${pkg}/v2/request/key/${timestamp.toString()}`, {
+                                    headers: {
+                                        Authorization: `Bearer ${jwt}`,
+                                    },
+                                })
+                            )
+                            .then((r) => r.json())
+                            .then((json) => {
+                                if (json.status !== "DONE" || json.proofStatus !== "VALID")
+                                    throw new Error("not done and valid");
+                                return json.key;
+                            })
+                            .catch((e) => console.log("error: ", e));
+                    },
+                },
+            };
+
+            const irma = new IrmaCore({debugging: true, session});
+
+            //irma.use(IrmaClient);
+            irma.use(IrmaPopup);
+
+            const usk = await irma.start();
+            console.log("retrieved usk: ", usk);
+
+            //Now that we've got the key (the one that was in the mausoleum...) we can go on and decrypt the message
+
+        }
+        )
+
+
+}
 
 // loader-code: wait until gmail.js has finished loading, before triggering actual extension-code.
 const loaderId = setInterval(() => {
@@ -84,8 +160,8 @@ function startExtension(gmail) {
 
                 msg.setSender(userEmail)    //I have to duplicate some information for compatibility with the other addons
                 msg.setRecipients(recipientsAddressesArray)
-                msg.setSubject(compose_ref.subject())
-                msg.setMessage('text/plain', compose_ref.body())    //Maybe also works without specifying the type, but body() returns a string anyway
+                msg.setSubject(emailSubject)
+                msg.setMessage('text/plain', emailBody)    //Maybe also works without specifying the type, but body() returns a string anyway
 
                 //Now send this constructed message to the service worker for encryption
                 chrome.runtime.sendMessage(extensionID,
@@ -94,11 +170,10 @@ function startExtension(gmail) {
                         identifiers: recipientsAddressesArray,
                         request: "encrypt"
                     }, (response)=>{
-                        console.log("Encrypted email: ", response.ciphertext)
+                        const encryptedEmail=response.ciphertext
 
-                        //Now construct a string with the correct format for compatibility with other IRMA addons
-                        let finalMimeObjectToSend=header+response.ciphertext
-                        console.log("Final MIME object to send:\n", finalMimeObjectToSend)
+
+                        let finalMimeObjectToSend=encryptedEmail
 
                         //Replace subject and body of the email with text explaining this is an IRMA encrypted email
                         const body="You received a PostGuard encrypted email from " + userEmail + "\n" +
@@ -145,6 +220,8 @@ function startExtension(gmail) {
                         evt.initEvent('change', false, true)
                         fileInput.dispatchEvent(evt)
 
+                        //DEBUG and now... Send the encrypted email back to the service worker to double-check that my encryption works.
+                        requestDecryption(extensionID, encryptedEmail, userEmail)
 
                     }
 
