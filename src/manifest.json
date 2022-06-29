@@ -28,6 +28,7 @@
   "icons": {
     "128": "icon-128.png"
   },
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAmwMdpDuEtzNmWWtoLJ69hcbee025zbQmJBT31hCmp5JdBkDO9c+tbTgeDwzgc58KuqlzrcIUfW+pW3zvk3jU05dAJb+8036uFCinUL6l5KgtL4rad/08rtJOZZjBYMIoh58zXc0q38eATzpqBcd5QDrHfNYy4tLeGuJ+oxRD/DbAmz/5BNGEc/8J9jh1Zoiy3JHFrxHMbz7qq2ZV6IOEtnhPIrXaZF4fWKHfQy0LoXGIHQJ95QfK6FTF1aUcER6SodWrWQT1GQxKgR2Vaz+6wULBev1RBrtKASwy0+cflWEqMBEKo1EuVExudjW4TQqcImelOqYR8J9bKK/cnDmNJwIDAQAB",
   "manifest_version": 3,
   "content_security_policy": {
     "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"

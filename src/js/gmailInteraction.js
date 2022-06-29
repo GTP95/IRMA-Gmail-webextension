@@ -10,7 +10,7 @@ import { ComposeMail } from "@e4a/irmaseal-mail-utils";
 
 console.log("ContentScript loaded");
 
-const extensionID = "aildglgdnaljgglacaodmibjehhgdkkg";
+const extensionID = "hmjfmafnafhppnngfnkjccjdjgnannea";
 const header =
   "Content-Type: application/postguard;\r\n" +
   'name="postguard.encrypted"\r\n' +

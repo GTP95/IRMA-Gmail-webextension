@@ -35,6 +35,7 @@
     "gmail-js": "^1.0.20",
     "jquery": "^3.6.0",
     "mimetext": "^2.0.7",
+    "prettier": "^2.7.1",
     "typescript": "^4.6.3",
     "workbox-webpack-plugin": "^6.5.3"
   }
