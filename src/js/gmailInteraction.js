@@ -1,7 +1,7 @@
 //@ts-check
 
 import * as IrmaCore from "@privacybydesign/irma-core";
-//  import * as IrmaClient from "@privacybydesign/irma-client";
+import * as IrmaClient from "@privacybydesign/irma-client";
 import * as IrmaPopup from "@privacybydesign/irma-popup";
 import "@privacybydesign/irma-css";
 import "gmail-js";
@@ -148,7 +148,7 @@ function startExtension(gmail) {
           let splittedArray;
           for (let recipient of recipientsArray) {
             if (recipient.includes("<") && recipient.includes(">")) {
-              //Dirty hack to detect the address' format, see previous comment    TODO: this could be probably made better by lloking for a method that properly extracts the email address or trying with a regex
+              //Dirty hack to detect the address' format, see previous comment    TODO: this could be probably made better by looking for a method that properly extracts the email address or trying with a regex
               splittedArray = recipient.split(new RegExp("[<>]"));
               recipientsAddressesArray.push(splittedArray[1]);
             } else recipientsAddressesArray.push(recipient); //If the condition is false, the email address is already in the correct form. All of this assuming nobody has bot '<' and '>' in their address...
@@ -157,7 +157,9 @@ function startExtension(gmail) {
 
           const emailBody = compose_ref.body();
           const emailSubject = compose_ref.subject();
+          const emailAttachments = compose_ref.attachments();
           console.log("Recipients: ", recipientsArray);
+          console.log("Attachments: ", emailAttachments);
 
           //create a mime object representing the email
           const msg = createMimeMessage();
@@ -166,6 +168,28 @@ function startExtension(gmail) {
           msg.setRecipients(recipientsAddressesArray);
           msg.setSubject(emailSubject);
           msg.setMessage("text/plain", emailBody); //Maybe also works without specifying the type, but body() returns a string anyway
+
+          // Let's grab all the attachments
+          let listOfAttchmentPromises = [];
+          for (let attachment in emailAttachments) {
+            listOfAttchmentPromises.push(
+              gmail.tools.make_request_download_promise(attachment.url, true)
+            );
+          }
+
+          console.log("List of attachment promises: ", listOfAttchmentPromises);
+
+          //And add them to the email
+          for (let promise in listOfAttchmentPromises) {
+            promise.then((result) => {
+              msg.setAttachment(result);
+            });
+          }
+
+          console.log(
+            "Sending this to the service worker for encryption: ",
+            msg.asRaw()
+          );
 
           //Now send this constructed message to the service worker for encryption
           chrome.runtime.sendMessage(
@@ -177,11 +201,13 @@ function startExtension(gmail) {
             },
             (response) => {
               const encryptedEmail = response.ciphertext; // Uint8Array
-              console.log(encryptedEmail);
+              console.log(
+                "Encrypted email (as received from the service worker): ",
+                encryptedEmail
+              );
 
-              // TODO: this is not a mime object
-              let finalMimeObjectToSend = objectToUInt8array(encryptedEmail);
-              console.log(finalMimeObjectToSend);
+              let byteDataToSend = objectToUInt8array(encryptedEmail);
+              console.log("Byte data that will be sent: ", byteDataToSend);
 
               //Replace subject and body of the email with text explaining this is an IRMA encrypted email
               const body =
@@ -214,7 +240,7 @@ function startExtension(gmail) {
                 "really are the intended recipient of the email.\n" +
                 "IRMA is a separate privacy-friendly authentication app\n" +
                 "(which is used also for other authentication purposes).\n" +
-                "The free IMRA app can be downloaded via the App Store and Play Store.\n" +
+                "The free IRMA app can be downloaded via the App Store and Play Store.\n" +
                 "More information via: https://irma.app";
 
               compose_ref.subject(subject);
@@ -223,22 +249,15 @@ function startExtension(gmail) {
               //And finally the fun part: try to add this as an attachment. For this, I use the hack suggested here: https://github.com/KartikTalwar/gmail.js/issues/635#issuecomment-808770417
 
               const fileInput = compose.$el.find("[type=file]")[0];
-              const file = new File(
-                [finalMimeObjectToSend],
-                "postguard.encrypted",
-                {
-                  type: "application/postguard",
-                }
-              );
+              const file = new File([byteDataToSend], "postguard.encrypted", {
+                type: "application/postguard",
+              });
               const dt = new DataTransfer();
               dt.items.add(file);
               fileInput.files = dt.files;
               const evt = document.createEvent("HTMLEvents");
               evt.initEvent("change", false, true);
               fileInput.dispatchEvent(evt);
-
-              //DEBUG and now... Send the encrypted email back to the service worker to double-check that my encryption works.
-              requestDecryption(extensionID, encryptedEmail, userEmail);
             }
           );
         },

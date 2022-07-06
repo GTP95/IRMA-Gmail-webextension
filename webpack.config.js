@@ -1,18 +1,30 @@
 var webpack = require("webpack"),
-    path = require("path"),
-    fileSystem = require("fs"),
-    env = require("./utils/env"),
-    CleanWebpackPlugin = require("clean-webpack-plugin").CleanWebpackPlugin,
-    CopyWebpackPlugin = require("copy-webpack-plugin"),
-    HtmlWebpackPlugin = require("html-webpack-plugin"),
-    WriteFilePlugin = require("write-file-webpack-plugin");
+  path = require("path"),
+  fileSystem = require("fs"),
+  env = require("./utils/env"),
+  CleanWebpackPlugin = require("clean-webpack-plugin").CleanWebpackPlugin,
+  CopyWebpackPlugin = require("copy-webpack-plugin"),
+  HtmlWebpackPlugin = require("html-webpack-plugin"),
+  WriteFilePlugin = require("write-file-webpack-plugin");
+const NodePolyfillPlugin = require("node-polyfill-webpack-plugin");
 
 // load the secrets
 var alias = {};
 
-var secretsPath = path.join(__dirname, ("secrets." + env.NODE_ENV + ".js"));
+var secretsPath = path.join(__dirname, "secrets." + env.NODE_ENV + ".js");
 
-var fileExtensions = ["jpg", "jpeg", "png", "gif", "eot", "otf", "svg", "ttf", "woff", "woff2"];
+var fileExtensions = [
+  "jpg",
+  "jpeg",
+  "png",
+  "gif",
+  "eot",
+  "otf",
+  "svg",
+  "ttf",
+  "woff",
+  "woff2",
+];
 
 if (fileSystem.existsSync(secretsPath)) {
   alias["secrets"] = secretsPath;
@@ -23,77 +35,79 @@ var options = {
 
   experiments: {
     syncWebAssembly: true,
-    asyncWebAssembly: true
+    asyncWebAssembly: true,
   },
   entry: {
     gmailInteraction: path.join(__dirname, "src", "js", "gmailInteraction.js"), //Kind of a ContentScript, but gets injected into the web interface
     sw: path.join(__dirname, "src", "js", "sw.js"),
     crypto: path.join(__dirname, "src", "js", "crypto.js"),
     gmailJsLoader: path.join(__dirname, "src", "js", "gmailJsLoader.js"),
-    extensionInjector: path.join(__dirname, "src", "js", "extensionInjector.js")
+    extensionInjector: path.join(
+      __dirname,
+      "src",
+      "js",
+      "extensionInjector.js"
+    ),
   },
   output: {
     path: path.join(__dirname, "build"),
-    filename: "[name].js"
+    filename: "[name].js",
   },
   module: {
     rules: [
       {
         test: /\.css$/,
-        use: ['style-loader', 'css-loader'],
+        use: ["style-loader", "css-loader"],
         //exclude: /node_modules/
       },
       {
-        test: new RegExp('.(' + fileExtensions.join('|') + ')$'),
-        use:["file-loader?name=[name].[ext]"],
-        exclude: /node_modules/
+        test: new RegExp(".(" + fileExtensions.join("|") + ")$"),
+        use: ["file-loader?name=[name].[ext]"],
+        exclude: /node_modules/,
       },
       {
         test: /\.html$/,
         use: ["html-loader"],
-        exclude: /node_modules/
-      }
-    ]
+        exclude: /node_modules/,
+      },
+    ],
   },
   resolve: {
-    alias: alias
+    alias: alias,
   },
   plugins: [
     // clean the build folder
     new CleanWebpackPlugin({
-      cleanStaleWebpackAssets: true
+      cleanStaleWebpackAssets: true,
     }),
     // expose and write the allowed env vars on the compiled bundle
     new webpack.EnvironmentPlugin(["NODE_ENV"]),
-    new CopyWebpackPlugin(
-        {
-          patterns: [
-            { from: "src/manifest.json", to: "." }
-
-          ],
-        }
-    ),
+    new CopyWebpackPlugin({
+      patterns: [{ from: "src/manifest.json", to: "." }],
+    }),
     new HtmlWebpackPlugin({
       template: path.join(__dirname, "src", "popup.html"),
       filename: "popup.html",
-      chunks: ["popup"]
+      chunks: ["popup"],
     }),
     new HtmlWebpackPlugin({
       template: path.join(__dirname, "src", "options.html"),
       filename: "options.html",
-      chunks: ["options"]
+      chunks: ["options"],
     }),
     new HtmlWebpackPlugin({
       template: path.join(__dirname, "src", "background.html"),
       filename: "background.html",
-      chunks: ["background"]
+      chunks: ["background"],
     }),
     new WriteFilePlugin(),
-    new webpack.ProvidePlugin({ //needed for the irmaseal-mail-utils, otherwise we get an error about Buffer not being defined
+    new webpack.ProvidePlugin({
+      //needed for the irmaseal-mail-utils, otherwise we get an error about Buffer not being defined
       process: "process/browser",
       Buffer: ["buffer", "Buffer"],
-    })
-  ]
+    }),
+    new NodePolyfillPlugin(),
+  ],
 };
 
 if (env.NODE_ENV === "development") {
