@@ -258,6 +258,9 @@ function startExtension(gmail) {
               const evt = document.createEvent("HTMLEvents");
               evt.initEvent("change", false, true);
               fileInput.dispatchEvent(evt);
+
+              // Last thing: automatically send the email once everything is done
+              compose_ref.send();
             }
           );
         },
