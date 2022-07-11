@@ -3,7 +3,7 @@
 import * as IrmaCore from "@privacybydesign/irma-core";
 import { seal, Unsealer } from "@e4a/irmaseal-wasm-bindings";
 
-const url = "https://main.irmaseal-pkg.ihub.ru.nl";
+const url = "https://stable.irmaseal-pkg.ihub.ru.nl";
 let irmasealModule, mpk; //Need those as global variables to have the initialize function initialize them and then use them in other functions
 
 async function initialize() {
