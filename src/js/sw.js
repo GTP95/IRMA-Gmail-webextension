@@ -94,6 +94,7 @@ chrome.runtime.onMessageExternal.addListener((msg, sender, sendResponse) => {
           console.log("Error in getting hidden policies: ", err);
         });
   }
+  return true;
 });
 
 console.log("Service worker started!");
