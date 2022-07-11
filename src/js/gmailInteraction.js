@@ -1,4 +1,4 @@
-//@ts-check
+// @ts-check
 
 import * as IrmaCore from "@privacybydesign/irma-core";
 import * as IrmaClient from "@privacybydesign/irma-client";
@@ -7,6 +7,7 @@ import "@privacybydesign/irma-css";
 import "gmail-js";
 import { createMimeMessage } from "mimetext";
 import { ComposeMail } from "@e4a/irmaseal-mail-utils";
+import { objectToUInt8array } from "./helpers";
 
 console.log("ContentScript loaded");
 
@@ -20,17 +21,7 @@ const pkg = "https://main.irmaseal-pkg.ihub.ru.nl";
 
 let ciphertext, hiddenPolicies;
 
-/**
- * Message passing messes up with types (I get a "generic" object instead of an array) plus the UInt8Array.from() method
- * fails silently when I try to use it to convert the object back to an Uint8Array. So I have to use the following.
- * @param object {Object}
- * @returns {Uint8Array}
- */
-function objectToUInt8array(object) {
-  return Uint8Array.from(Object.values(object));
-}
-
-function requestDecryption(extensionID, message, identity) {
+function requestDecryption(extensionID, message, identity, callback) {
   //First we need to get the hidden policies. Why they play hide-and-seek, is still debated
   chrome.runtime.sendMessage(
     extensionID,
@@ -41,7 +32,7 @@ function requestDecryption(extensionID, message, identity) {
     async (response) => {
       const hidden = response.content;
       const keyRequest = {
-        con: [{ t: "irma-demo.gemeente.personalData.fullname", v: identity }],
+        con: [{ t: "pbdf.sidn-pbdf.email.email", v: identity }],
         validity: 600, // 1 minute
       };
       const timestamp = hidden[identity].ts;
@@ -85,17 +76,36 @@ function requestDecryption(extensionID, message, identity) {
         },
       };
 
-      const irma = new IrmaCore({ debugging: true, session });
+      const irma = new IrmaCore({ debugging: true, session }); //TODO: ask if it's better to switch to false
 
-      //irma.use(IrmaClient);
+      irma.use(IrmaClient);
       irma.use(IrmaPopup);
 
       const usk = await irma.start();
       console.log("retrieved usk: ", usk);
 
       //Now that we've got the key (the one that was in the mausoleum...) we can go on and decrypt the message
+      chrome.runtime.sendMessage(
+        extensionID,
+        {
+          request: "decrypt",
+          content: message,
+          usk: usk,
+        },
+        callback
+      );
     }
   );
+}
+
+/**
+ * Returns true if attachment has the name "postguard.encrypted".
+ * Unfortunateky I can't use the MIME type to detect PostGuard attachments, as Gmail changes it to "application/octet-stream"
+ * @param attachment
+ * @returns {boolean}
+ */
+function isPostguardAttachment(attachment) {
+  return attachment.name.toLowerCase() === "postguard.encrypted";
 }
 
 // loader-code: wait until gmail.js has finished loading, before triggering actual extension-code.
@@ -124,6 +134,26 @@ function startExtension(gmail) {
       console.log("Looking at email:", domEmail);
       const emailData = gmail.new.get.email_data(domEmail);
       console.log("Email data:", emailData);
+
+      const attachments = emailData.attachments;
+      for (let attachment in attachments) {
+        console.log("Processing attachment: ", attachments[attachment]); //I was expecting "attachment" to contain the object representing the attachment. It contains the index instead.
+        //If the email contains PostGuard attachments, retrieve and decrypt them
+        if (isPostguardAttachment(attachments[attachment])) {
+          gmail.tools
+            .make_request_download_promise(attachments[attachment].url, true)
+            .then((postGuardMessage) =>
+              requestDecryption(
+                extensionID,
+                postGuardMessage,
+                userEmail,
+                (response) => {
+                  console.log("Decrypted: ", response);
+                }
+              )
+            );
+        }
+      }
     });
 
     gmail.observe.on("compose", (compose) => {
@@ -173,6 +203,7 @@ function startExtension(gmail) {
           let listOfAttchmentPromises = [];
           for (let attachment in emailAttachments) {
             listOfAttchmentPromises.push(
+              // @ts-ignore
               gmail.tools.make_request_download_promise(attachment.url, true)
             );
           }
@@ -181,6 +212,7 @@ function startExtension(gmail) {
 
           //And add them to the email
           for (let promise in listOfAttchmentPromises) {
+            // @ts-ignore
             promise.then((result) => {
               msg.setAttachment(result);
             });
