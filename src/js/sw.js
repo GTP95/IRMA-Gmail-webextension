@@ -4,6 +4,7 @@
 
 import { encrypt, decrypt, getHiddenPolicies } from "./crypto";
 import { objectToUInt8array } from "./helpers";
+import parse from "emailjs-mime-parser";
 
 chrome.runtime.onMessageExternal.addListener((msg, sender, sendResponse) => {
   console.log("Message listener invoked");
@@ -62,6 +63,9 @@ chrome.runtime.onMessageExternal.addListener((msg, sender, sendResponse) => {
           console.log("Decrypted (but still encoded) plaintext: ", result);
           result = new TextDecoder().decode(result);
           console.log("Decrypted (and decoded) plaintext: ", result);
+
+          const parsedEmail = parse(result);
+          console.log(parsedEmail);
 
           sendResponse(
             //Decryption successful
