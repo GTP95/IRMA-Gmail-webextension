@@ -21,6 +21,13 @@ const pkg = "https://main.irmaseal-pkg.ihub.ru.nl";
 
 let ciphertext, hiddenPolicies;
 
+/**
+ * Wraps up the steps needed
+ * @param extensionID
+ * @param message
+ * @param identity
+ * @param callback
+ */
 function requestDecryption(extensionID, message, identity, callback) {
   //First we need to get the hidden policies. Why they play hide-and-seek, is still debated
   chrome.runtime.sendMessage(
@@ -91,6 +98,7 @@ function requestDecryption(extensionID, message, identity, callback) {
           request: "decrypt",
           content: message,
           usk: usk,
+          identity: identity,
         },
         callback
       );
@@ -100,7 +108,7 @@ function requestDecryption(extensionID, message, identity, callback) {
 
 /**
  * Returns true if attachment has the name "postguard.encrypted".
- * Unfortunateky I can't use the MIME type to detect PostGuard attachments, as Gmail changes it to "application/octet-stream"
+ * Unfortunately I can't use the MIME type to detect PostGuard attachments, as Gmail changes it to "application/octet-stream"
  * @param attachment
  * @returns {boolean}
  */
@@ -148,7 +156,8 @@ function startExtension(gmail) {
                 postGuardMessage,
                 userEmail,
                 (response) => {
-                  console.log("Decrypted: ", response);
+                  console.log("Response object: ", response);
+                  console.log("Decrypted: ", response.plaintext);
                 }
               )
             );
@@ -195,6 +204,7 @@ function startExtension(gmail) {
           const msg = createMimeMessage();
 
           msg.setSender(userEmail); //I have to duplicate some information for compatibility with the other addons
+          // @ts-ignore
           msg.setRecipients(recipientsAddressesArray);
           msg.setSubject(emailSubject);
           msg.setMessage("text/plain", emailBody); //Maybe also works without specifying the type, but body() returns a string anyway
@@ -214,6 +224,7 @@ function startExtension(gmail) {
           for (let promise in listOfAttchmentPromises) {
             // @ts-ignore
             promise.then((result) => {
+              // @ts-ignore
               msg.setAttachment(result);
             });
           }

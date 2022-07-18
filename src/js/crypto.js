@@ -60,8 +60,12 @@ export async function encrypt(readable, writable, identifiers) {
  */
 export async function decrypt(readable, writable, usk, identity) {
   try {
+    console.log("Inside decrypt, ReadableStream: ", readable);
     const unsealer = await Unsealer.new(readable);
     // Unseal the contents of the IRMAseal packet, writing the plaintext to a `WritableStream`.
+    console.log("Inside decrypt, identity: ", identity);
+    console.log("Inside decrypt, usk: ", usk);
+    console.log("Inside decrypt, WritableStream: ", writable);
     await unsealer.unseal(identity, usk, writable);
   } catch (error) {
     console.log(error);

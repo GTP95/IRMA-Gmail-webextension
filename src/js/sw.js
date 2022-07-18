@@ -62,6 +62,7 @@ chrome.runtime.onMessageExternal.addListener((msg, sender, sendResponse) => {
           console.log("Decrypted (but still encoded) plaintext: ", result);
           result = new TextDecoder().decode(result);
           console.log("Decrypted (and decoded) plaintext: ", result);
+
           sendResponse(
             //Decryption successful
             {
