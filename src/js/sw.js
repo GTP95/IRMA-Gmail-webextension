@@ -65,12 +65,12 @@ chrome.runtime.onMessageExternal.addListener((msg, sender, sendResponse) => {
           console.log("Decrypted (and decoded) plaintext: ", result);
 
           const parsedEmail = parse(result);
-          console.log(parsedEmail);
+          console.log("Parsed email: ", parsedEmail);
 
           sendResponse(
             //Decryption successful
             {
-              plaintext: result,
+              plaintext: parsedEmail,
               type: "plaintext",
             }
           );

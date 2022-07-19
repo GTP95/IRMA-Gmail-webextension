@@ -7,7 +7,7 @@ import "@privacybydesign/irma-css";
 import "gmail-js";
 import { createMimeMessage } from "mimetext";
 import { ComposeMail } from "@e4a/irmaseal-mail-utils";
-import { objectToUInt8array } from "./helpers";
+import { objectToUInt8array, extractEmailBodyFromHTML } from "./helpers";
 
 console.log("ContentScript loaded");
 
@@ -156,8 +156,16 @@ function startExtension(gmail) {
                 postGuardMessage,
                 userEmail,
                 (response) => {
+                  const parsedEmailObject = response.plaintext;
                   console.log("Response object: ", response);
-                  console.log("Decrypted: ", response.plaintext);
+                  console.log("Parsed email object: ", parsedEmailObject);
+                  const bodyAsHTML = new TextDecoder().decode(
+                    objectToUInt8array(parsedEmailObject.content)
+                  );
+                  console.log("HTML body: ", bodyAsHTML); //TODO: what if email isn't in HTML format? How do I detect this? Probably it is enough to inspect the 'contentType' parameter
+                  const bodyAsText = extractEmailBodyFromHTML(bodyAsHTML);
+                  console.log("Body: ", bodyAsText);
+                  domEmail.body(bodyAsText);
                 }
               )
             );

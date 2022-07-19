@@ -40,3 +40,15 @@ function base64ToUInt8Array(base64) {
   }
   return bytes.buffer;
 }
+
+/**
+ * Takes a string representing an email's body as HTML and returns the content as a string.
+ * Can't be used inside a service worker because uses the DOM API.
+ * @param {string}emailBodyAsHTML A string representing the email's body as HTML
+ * @returns {string} The email's body content
+ */
+export function extractEmailBodyFromHTML(emailBodyAsHTML) {
+  const bodyAsHTML = document.createElement("html");
+  bodyAsHTML.innerHTML = emailBodyAsHTML;
+  return bodyAsHTML.innerText;
+}
