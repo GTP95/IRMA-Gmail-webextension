@@ -177,7 +177,7 @@ function startExtension(gmail) {
       const compose_ref = gmail.dom.composes()[0];
       gmail.tools.add_compose_button(
         compose_ref,
-        "IRMA",
+        "PostGuard",
         function () {
           const emailRecipients = compose_ref.recipients(); // I'm not getting how to specify options, working with this for now
           const recipientsArray = [];
