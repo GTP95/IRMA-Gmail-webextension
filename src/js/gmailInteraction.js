@@ -10,6 +10,7 @@ import {
   objectToUInt8array,
   extractEmailBodyFromHTML,
   generateBody,
+  uint8ArrayToBase64,
 } from "./helpers";
 
 console.log("ContentScript loaded");
@@ -184,7 +185,7 @@ function startExtension(gmail) {
       gmail.tools.add_compose_button(
         compose_ref,
         "PostGuard",
-        function () {
+        async function () {
           const emailRecipients = compose_ref.recipients(); // I'm not getting how to specify options, working with this for now
           const recipientsArray = [];
           for (const recipient of emailRecipients.to) {
@@ -211,9 +212,9 @@ function startExtension(gmail) {
 
           const emailBody = compose_ref.body();
           const emailSubject = compose_ref.subject();
-          const emailAttachments = compose_ref.attachments();
+          const emailAttachmentsInfo = compose_ref.attachments();
           console.log("Recipients: ", recipientsArray);
-          console.log("Attachments: ", emailAttachments);
+          console.log("Attachments: ", emailAttachmentsInfo);
 
           // create a mime object representing the email
           const msg = createMimeMessage();
@@ -225,23 +226,28 @@ function startExtension(gmail) {
           msg.setMessage("text/plain", emailBody); // Maybe also works without specifying the type, but body() returns a string anyway
 
           // Let's grab all the attachments
-          const listOfAttchmentPromises = [];
-          for (const attachment in emailAttachments) {
-            listOfAttchmentPromises.push(
-              // @ts-ignore
-              gmail.tools.make_request_download_promise(attachment.url, true)
-            );
+          const attachmentsData = [];
+          for (const attachmentInfo of emailAttachmentsInfo) {
+            const attachmentData =
+              await gmail.tools.make_request_download_promise(
+                attachmentInfo.url,
+                true
+              );
+            attachmentsData.push(attachmentData);
           }
 
-          console.log("List of attachment promises: ", listOfAttchmentPromises);
+          console.log("List of attachments data: ", attachmentsData);
 
           // And add them to the email
-          for (const promise in listOfAttchmentPromises) {
-            // @ts-ignore
-            promise.then((result) => {
-              // @ts-ignore
-              msg.setAttachment(result);
-            });
+          for (const attachment of attachmentsData) {
+            console.log("attachment: ", attachment);
+            console.log("Reported type of attachment: ", typeof attachment);
+
+            msg.setAttachment(
+              "Encrypted attachment",
+              `text/plain`,
+              uint8ArrayToBase64(attachment)
+            ); //For the attachment's type I can only use text/html or text/plain
           }
 
           console.log(

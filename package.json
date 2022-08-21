@@ -38,6 +38,7 @@
     "gmail-js": "^1.0.23",
     "https": "^1.0.0",
     "jquery": "^3.6.0",
+    "log4js": "^6.6.1",
     "mimetext": "^2.0.7",
     "node-polyfill-webpack-plugin": "^2.0.0",
     "prettier": "^2.7.1",

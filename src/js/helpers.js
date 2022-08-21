@@ -4,8 +4,8 @@
  * @param object {Object}
  * @returns {Uint8Array}
  */
-export function objectToUInt8array (object) {
-  return Uint8Array.from(Object.values(object))
+export function objectToUInt8array(object) {
+  return Uint8Array.from(Object.values(object));
 }
 
 /**
@@ -14,14 +14,14 @@ export function objectToUInt8array (object) {
  * @param {Uint8Array} array
  * @returns {string}
  */
-function uint8ArrayToBase64 (array) {
-  let binary = ''
-  const bytes = array
-  const len = bytes.byteLength
+export function uint8ArrayToBase64(array) {
+  let binary = "";
+  const bytes = array;
+  const len = bytes.byteLength;
   for (let i = 0; i < len; i++) {
-    binary += String.fromCharCode(bytes[i])
+    binary += String.fromCharCode(bytes[i]);
   }
-  return btoa(binary)
+  return btoa(binary);
 }
 
 /**
@@ -31,14 +31,14 @@ function uint8ArrayToBase64 (array) {
  * @returns {ArrayBufferLike}
  * @private
  */
-function base64ToUInt8Array (base64) {
-  const binary_string = atob(base64)
-  const len = binary_string.length
-  const bytes = new Uint8Array(len)
+function base64ToUInt8Array(base64) {
+  const binary_string = atob(base64);
+  const len = binary_string.length;
+  const bytes = new Uint8Array(len);
   for (let i = 0; i < len; i++) {
-    bytes[i] = binary_string.charCodeAt(i)
+    bytes[i] = binary_string.charCodeAt(i);
   }
-  return bytes.buffer
+  return bytes.buffer;
 }
 
 /**
@@ -47,45 +47,45 @@ function base64ToUInt8Array (base64) {
  * @param {string}emailBodyAsHTML A string representing the email's body as HTML
  * @returns {string} The email's body content
  */
-export function extractEmailBodyFromHTML (emailBodyAsHTML) {
-  const bodyAsHTML = document.createElement('html')
-  bodyAsHTML.innerHTML = emailBodyAsHTML
-  return bodyAsHTML.innerText
+export function extractEmailBodyFromHTML(emailBodyAsHTML) {
+  const bodyAsHTML = document.createElement("html");
+  bodyAsHTML.innerHTML = emailBodyAsHTML;
+  return bodyAsHTML.innerText;
 }
 
-export function generateBody (userEmail) {
+export function generateBody(userEmail) {
   const body =
-      'You received a PostGuard encrypted email from ' +
-      userEmail +
-      '\n' +
-      'There are four ways to read this protected email:\n' +
-      '1) If you use Outlook and have already installed PostGuard, click on the "Decrypt Email"-button. \n' +
-      'This button can be found on the right side of the ribbon above.\n' +
-      '2) You can decrypt and read this email via https://www.postguard.eu/decrypt/.\n' +
-      'This website can only decrypt emails.\n' +
-      '3) You can install the free PostGuard addon in your own mail client.\n' +
-      'This works for Outlook and Thunderbird.\n' +
-      "4) You can install the free postGuard extension in your own browser and use Gmail's webmail+\n" +
-      'Download PostGuard via: https://www.postguard.eu\n' +
-      'After installation, you can not only decrypt and read emails but also all future Postguarded emails. \n' +
-      'Moreover, you can easily send and receive secure emails with the PostGuard addon within your email client.\n' +
-      '\n' +
-      'What is PostGuard?\n' +
-      '\n' +
-      'PostGuard is a service for secure emailing. Only the intended recipient(s) can decrypt\n' +
-      'and read the emails sent with PostGuard. \n' +
-      'The "Encryption for all"-team of the Radboud University has developed PostGuard.\n' +
-      'PostGuard uses the IRMA app for authentication. \n' +
-      'More information via: https://www.postguard.eu\n' +
-      '\n' +
-      'What is the IRMA app?\n' +
-      '\n' +
-      'When you receive a PostGuarded email, you need to use the IRMA app to prove that you\n' +
-      'really are the intended recipient of the email.\n' +
-      'IRMA is a separate privacy-friendly authentication app\n' +
-      '(which is used also for other authentication purposes).\n' +
-      'The free IRMA app can be downloaded via the App Store and Play Store.\n' +
-      'More information via: https://irma.app'
+    "You received a PostGuard encrypted email from " +
+    userEmail +
+    "\n" +
+    "There are four ways to read this protected email:\n" +
+    '1) If you use Outlook and have already installed PostGuard, click on the "Decrypt Email"-button. \n' +
+    "This button can be found on the right side of the ribbon above.\n" +
+    "2) You can decrypt and read this email via https://www.postguard.eu/decrypt/.\n" +
+    "This website can only decrypt emails.\n" +
+    "3) You can install the free PostGuard addon in your own mail client.\n" +
+    "This works for Outlook and Thunderbird.\n" +
+    "4) You can install the free postGuard extension in your own browser and use Gmail's webmail+\n" +
+    "Download PostGuard via: https://www.postguard.eu\n" +
+    "After installation, you can not only decrypt and read emails but also all future Postguarded emails. \n" +
+    "Moreover, you can easily send and receive secure emails with the PostGuard addon within your email client.\n" +
+    "\n" +
+    "What is PostGuard?\n" +
+    "\n" +
+    "PostGuard is a service for secure emailing. Only the intended recipient(s) can decrypt\n" +
+    "and read the emails sent with PostGuard. \n" +
+    'The "Encryption for all"-team of the Radboud University has developed PostGuard.\n' +
+    "PostGuard uses the IRMA app for authentication. \n" +
+    "More information via: https://www.postguard.eu\n" +
+    "\n" +
+    "What is the IRMA app?\n" +
+    "\n" +
+    "When you receive a PostGuarded email, you need to use the IRMA app to prove that you\n" +
+    "really are the intended recipient of the email.\n" +
+    "IRMA is a separate privacy-friendly authentication app\n" +
+    "(which is used also for other authentication purposes).\n" +
+    "The free IRMA app can be downloaded via the App Store and Play Store.\n" +
+    "More information via: https://irma.app";
 
-  return body
+  return body;
 }
