@@ -35,7 +35,7 @@
     "buffer": "^6.0.3",
     "emailjs-mime-parser": "^2.0.7",
     "eslint": "^8.20.0",
-    "gmail-js": "^1.0.23",
+    "gmail-js": "^1.0.24",
     "https": "^1.0.0",
     "jquery": "^3.6.0",
     "log4js": "^6.6.1",

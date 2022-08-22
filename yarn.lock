@@ -3298,10 +3298,10 @@ globby@^6.1.0:
     pify "^2.0.0"
     pinkie-promise "^2.0.0"
 
-gmail-js@^1.0.23:
-  version "1.0.23"
-  resolved "https://registry.yarnpkg.com/gmail-js/-/gmail-js-1.0.23.tgz#9b2f88d9ac416a447499abec8912d13c87a9c536"
-  integrity sha512-rr5U0IGQcU28rMOd+b2pOqfwKLoRRgeg7rhays4TJl1H/Qw5AGDL/hni9nBx2UhTXN2uGB59MoBsfYI7VDtsIw==
+gmail-js@^1.0.24:
+  version "1.0.24"
+  resolved "https://registry.yarnpkg.com/gmail-js/-/gmail-js-1.0.24.tgz#96bb7d75dc6523be61c303457fca6475c48bd9a5"
+  integrity sha512-+0Pap+HFT4Z0WaTIgPSHcf+cfkFEaDLqTUsGiNbqttPnnxvKLM0z6a2i3SlwLFP8e6amiZDsUvLesGv+YJg2zA==
   dependencies:
     jquery "^3.3.1"
 
