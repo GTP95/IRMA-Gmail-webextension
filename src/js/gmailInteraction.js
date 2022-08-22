@@ -158,7 +158,10 @@ function startExtension(gmail) {
                   const parsedEmailObject = response.plaintext;
                   console.log("Response object: ", response);
                   console.log("Parsed email object: ", parsedEmailObject);
-                  const subject = parsedEmailObject.headers.subject[0].value;
+                  const subject =
+                    parsedEmailObject.headers.subject == undefined
+                      ? "(Subject unknown)"
+                      : parsedEmailObject.headers.subject[0].value;
                   console.log("Subject: ", subject);
                   const bodyAsHTML = new TextDecoder().decode(
                     objectToUInt8array(parsedEmailObject.content)
