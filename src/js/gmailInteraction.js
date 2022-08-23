@@ -35,6 +35,12 @@ function requestDecryption(extensionID, message, identity, callback) {
       request: "hidden policies",
     },
     async (response) => {
+      if (response == undefined) {
+        console.error(
+          "Something went wrong in receiving the hidden policies from the service worker, maybe a problem with message passing?"
+        );
+        return;
+      }
       const hidden = response.content;
       const keyRequest = {
         con: [{ t: "pbdf.sidn-pbdf.email.email", v: identity }],
@@ -155,22 +161,31 @@ function startExtension(gmail) {
                 postGuardMessage,
                 userEmail,
                 (response) => {
+                  if (response == undefined) {
+                    console.error(
+                      "Got an undefined response from service worker instead of the plaintext, maybe a problem " +
+                        "with message passing?"
+                    );
+                    return;
+                  }
                   const parsedEmailObject = response.plaintext;
                   console.log("Response object: ", response);
                   console.log("Parsed email object: ", parsedEmailObject);
                   const subject = parsedEmailObject.headers.subject[0].value;
                   console.log("Subject: ", subject);
-                  const bodyAsHTML = new TextDecoder().decode(
-                    objectToUInt8array(parsedEmailObject.content)
-                  );
-                  console.log("HTML body: ", bodyAsHTML); // TODO: what if email isn't in HTML format? How do I detect this? Probably it is enough to inspect the 'contentType' parameter
-                  const bodyAsText = extractEmailBodyFromHTML(bodyAsHTML);
-                  console.log("Body: ", bodyAsText);
+                  if (parsedEmailObject.content != null) {
+                    //Extract email's body only if it actually exists
+                    const bodyAsHTML = new TextDecoder().decode(
+                      objectToUInt8array(parsedEmailObject.content)
+                    );
+                    console.log("HTML body: ", bodyAsHTML); // TODO: what if email isn't in HTML format? How do I detect this? Probably it is enough to inspect the 'contentType' parameter
+                    const bodyAsText = extractEmailBodyFromHTML(bodyAsHTML);
+                    console.log("Body: ", bodyAsText);
+                    domEmail.body(bodyAsText);
+                  } else domEmail.body(" "); //Set an empty body if the original email doesn't have one. Cosmetic functionality to remove the instructions about how to decrypt
                   //set email's subject
                   const subjectNode = gmail.dom.email_subject();
                   subjectNode.text(subject);
-
-                  domEmail.body(bodyAsText);
                 }
               )
             );
