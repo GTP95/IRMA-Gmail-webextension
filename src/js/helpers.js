@@ -98,8 +98,24 @@ export function generateBody(userEmail) {
  * @param {String}mailAsString
  * @returns {Object}
  */
-function parseMIMEmailWithAttachments(mailAsString) {
+export function parseMIMEmailWithAttachments(mailAsString) {
   //extract the boundary string from the header
+  const splittedMessageArray = mailAsString.split("boundary=");
+  console.log("splittedMessageArray: ", splittedMessageArray);
+  const splitAgain = splittedMessageArray[1].split("\n");
+  console.log("splitAgain", splitAgain);
+  const boundary = splitAgain[0];
+  console.log("Boundary: ", boundary);
+  const messagePartsArray = mailAsString.split("--" + boundary);
+  console.log("Message parts: ", messagePartsArray);
 
+  //Now to get the body I need to split around two empty lines
+  const body = messagePartsArray[1].split("\n\n")[1]; //TODO: to account for possible double line breaks inside the message, I should remove first and last element of the array and gluing together the other elements adding \n\n between them
+  console.log("Body: ", body);
+
+  //And now let's get the attachments. Assuming only one attachment for now. TODO: generalize
+
+  let result = {};
+  result.body = body;
   return result;
 }

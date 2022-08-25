@@ -11,6 +11,7 @@ import {
   extractEmailBodyFromHTML,
   generateBody,
   uint8ArrayToBase64,
+  parseMIMEmailWithAttachments,
 } from "./helpers";
 
 console.log("ContentScript loaded");
@@ -178,7 +179,10 @@ function startExtension(gmail) {
                   console.log("Subject: ", subject);
 
                   console.log("Email's content: ", parsedEmailObject.content);
-                  if (parsedEmailObject.content != null) {
+                  if (
+                    parsedEmailObject.content != null &&
+                    parsedEmailObject != undefined
+                  ) {
                     //Extract email's body only if it actually exists
 
                     const bodyAsHTML = new TextDecoder().decode(
@@ -188,6 +192,11 @@ function startExtension(gmail) {
                     const bodyAsText = extractEmailBodyFromHTML(bodyAsHTML);
                     console.log("Body: ", bodyAsText);
                     domEmail.body(bodyAsText);
+                  } else if (parsedEmailObject.content == undefined) {
+                    //The parsing failed due to attachments
+                    const result = parseMIMEmailWithAttachments(
+                      parsedEmailObject.raw
+                    );
                   } else domEmail.body(" "); //Set an empty body if the original email doesn't have one. Cosmetic functionality to remove the instructions about how to decrypt
                   //set email's subject
                   const subjectNode = gmail.dom.email_subject();
