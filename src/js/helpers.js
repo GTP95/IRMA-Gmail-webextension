@@ -89,3 +89,17 @@ export function generateBody(userEmail) {
 
   return body;
 }
+
+/**
+ * The library I'm using to parse MIME messages messes up when the email contains an attachment. So I'm writing my own
+ * parser for messages with attachments. The result is an object with the following two fields:
+ * body: a string containing the email's body
+ * attachments: a list of uint8Arrays representing the attachments.
+ * @param {String}mailAsString
+ * @returns {Object}
+ */
+function parseMIMEmailWithAttachments(mailAsString) {
+  //extract the boundary string from the header
+
+  return result;
+}

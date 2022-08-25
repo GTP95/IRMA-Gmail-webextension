@@ -173,6 +173,7 @@ function startExtension(gmail) {
                   const parsedEmailObject = response.plaintext;
                   console.log("Response object: ", response);
                   console.log("Parsed email object: ", parsedEmailObject);
+                  console.log("Raw MIME message: ", parsedEmailObject.raw);
                   const subject = parsedEmailObject.headers.subject[0].value;
                   console.log("Subject: ", subject);
 
