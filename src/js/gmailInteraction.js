@@ -173,17 +173,14 @@ function startExtension(gmail) {
                   const parsedEmailObject = response.plaintext;
                   console.log("Response object: ", response);
                   console.log("Parsed email object: ", parsedEmailObject);
-                  console.log("Raw MIME message: ", parsedEmailObject.raw);
-                  const subject = parsedEmailObject.headers.subject[0].value;
+
+                  const subject = parsedEmailObject.subject;
                   console.log("Subject: ", subject);
 
-                  console.log("Email's content: ", parsedEmailObject.content);
-                  if (parsedEmailObject.content != null) {
+                  if (parsedEmailObject.html != null) {
                     //Extract email's body only if it actually exists
 
-                    const bodyAsHTML = new TextDecoder().decode(
-                      objectToUInt8array(parsedEmailObject.content)
-                    );
+                    const bodyAsHTML = parsedEmailObject.html;
                     console.log("HTML body: ", bodyAsHTML); // TODO: what if email isn't in HTML format? How do I detect this? Probably it is enough to inspect the 'contentType' parameter
                     const bodyAsText = extractEmailBodyFromHTML(bodyAsHTML);
                     console.log("Body: ", bodyAsText);

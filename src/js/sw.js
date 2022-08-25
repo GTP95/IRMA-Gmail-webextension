@@ -4,7 +4,10 @@
 
 import { encrypt, decrypt, getHiddenPolicies } from "./crypto";
 import { objectToUInt8array } from "./helpers";
-import parse from "emailjs-mime-parser";
+
+const { PostalMime } = require("postal-mime").default;
+
+console.log("postal-mime: ", PostalMime);
 
 chrome.runtime.onMessageExternal.addListener((msg, sender, sendResponse) => {
   console.log("Message listener invoked");
@@ -59,13 +62,13 @@ chrome.runtime.onMessageExternal.addListener((msg, sender, sendResponse) => {
         },
       });
       decrypt(readableStream, writableStream, msg.usk, msg.identity).then(
-        () => {
+        async () => {
           console.log("Decrypted (but still encoded) plaintext: ", result);
           result = new TextDecoder().decode(result);
           console.log("Decrypted (and decoded) plaintext: ", result);
 
-          const parsedEmail = parse(result);
-          parsedEmail.finalize(); //Hopefully this will emit the body in case of attachments
+          const parser = new PostalMime();
+          const parsedEmail = await parser.parse(result);
           console.log("Parsed email: ", parsedEmail);
 
           sendResponse(

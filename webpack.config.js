@@ -6,8 +6,7 @@ const webpack = require("webpack"),
   CopyWebpackPlugin = require("copy-webpack-plugin"),
   HtmlWebpackPlugin = require("html-webpack-plugin"),
   WriteFilePlugin = require("write-file-webpack-plugin"),
-  NodePolyfillPlugin = require("node-polyfill-webpack-plugin"),
-  MIMEparser = require("emailjs-mime-parser");
+  NodePolyfillPlugin = require("node-polyfill-webpack-plugin");
 
 // load the secrets
 let alias = {};
