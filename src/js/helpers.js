@@ -114,8 +114,16 @@ export function parseMIMEmailWithAttachments(mailAsString) {
   console.log("Body: ", body);
 
   //And now let's get the attachments. Assuming only one attachment for now. TODO: generalize
+  //Again, I have to split around a blank line, but this time I don't have to worry about other blank lines in the middle of an attachment since it's encoded
+  const b64EncodedAttachment = messagePartsArray[2].split("\n\n")[1];
+  console.log("b64-encoded attachment: ", b64EncodedAttachment);
+  const uint8ArrayAttachment = base64ToUInt8Array(b64EncodedAttachment);
+  console.log("uint8array attachment: ", uint8ArrayAttachment);
 
   let result = {};
+  let attachments = [];
+  attachments.push(uint8ArrayAttachment);
   result.body = body;
+  result.attachments = attachments;
   return result;
 }
