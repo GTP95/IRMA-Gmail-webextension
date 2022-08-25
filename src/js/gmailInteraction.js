@@ -143,6 +143,8 @@ function startExtension(gmail) {
     const userEmail = gmail.get.user_email();
     console.log("Hello, " + userEmail + ". This is your extension talking!");
 
+    /* VIEWING AN EMAIL */
+
     gmail.observe.on("view_email", (domEmail) => {
       console.log("Looking at email:", domEmail);
       const emailData = gmail.new.get.email_data(domEmail);
@@ -173,8 +175,11 @@ function startExtension(gmail) {
                   console.log("Parsed email object: ", parsedEmailObject);
                   const subject = parsedEmailObject.headers.subject[0].value;
                   console.log("Subject: ", subject);
+
+                  console.log("Email's content: ", parsedEmailObject.content);
                   if (parsedEmailObject.content != null) {
                     //Extract email's body only if it actually exists
+
                     const bodyAsHTML = new TextDecoder().decode(
                       objectToUInt8array(parsedEmailObject.content)
                     );
@@ -192,6 +197,8 @@ function startExtension(gmail) {
         }
       }
     });
+
+    /* COMPOSING AN EMAIL */
 
     gmail.observe.on("compose", (compose) => {
       console.log("New compose window is opened!", compose);
@@ -213,7 +220,7 @@ function startExtension(gmail) {
             recipientsArray.push(recipient);
           }
 
-          // And now extract the email address from each string (at this point those are in the format "name <email.addrss@domain.com>", but only if they already are in the address book! That's why I need an if later to check the format
+          // And now extract the email address from each string (at this point those are in the format "name <email.addrss@domain.com>", but only if they already are in the address book! That's why I need an if later to check the format)
           const recipientsAddressesArray = [];
           let splittedArray;
           for (const recipient of recipientsArray) {
@@ -279,7 +286,7 @@ function startExtension(gmail) {
               request: "encrypt",
             },
             (response) => {
-              const encryptedEmail = response.ciphertext; // Uint8Array
+              const encryptedEmail = response.ciphertext;
               console.log(
                 "Encrypted email (as received from the service worker): ",
                 encryptedEmail
@@ -297,6 +304,7 @@ function startExtension(gmail) {
               // And finally the fun part: try to add this as an attachment. For this, I use the hack suggested here: https://github.com/KartikTalwar/gmail.js/issues/635#issuecomment-808770417
 
               const fileInput = compose.$el.find("[type=file]")[0];
+              console.log("Files:", fileInput.files);
               const file = new File([byteDataToSend], "postguard.encrypted", {
                 type: "application/postguard",
               });
