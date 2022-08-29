@@ -197,6 +197,8 @@ function startExtension(gmail) {
                     const result = parseMIMEmailWithAttachments(
                       parsedEmailObject.raw
                     );
+                    domEmail.body(result.body);
+                    //Handle attachments here...
                   } else domEmail.body(" "); //Set an empty body if the original email doesn't have one. Cosmetic functionality to remove the instructions about how to decrypt
                   //set email's subject
                   const subjectNode = gmail.dom.email_subject();

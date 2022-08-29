@@ -110,19 +110,28 @@ export function parseMIMEmailWithAttachments(mailAsString) {
   console.log("Message parts: ", messagePartsArray);
 
   //Now to get the body I need to split around two empty lines
-  const body = messagePartsArray[1].split("\n\n")[1]; //TODO: to account for possible double line breaks inside the message, I should remove first and last element of the array and gluing together the other elements adding \n\n between them
+  const body = messagePartsArray[1].split("\n\n")[1]; //TODO: to account for possible double line breaks inside the message, I should remove first and last element of the array and gluing together the other elements adding \n\n between them. Addendum: not really, it works if it is in HTML format because there are tags insteaad of blank lines, but what if it is in txt format? I need to test this but skipping for now
   console.log("Body: ", body);
 
   //And now let's get the attachments. Assuming only one attachment for now. TODO: generalize
   //Again, I have to split around a blank line, but this time I don't have to worry about other blank lines in the middle of an attachment since it's encoded
-  const b64EncodedAttachment = messagePartsArray[2].split("\n\n")[1];
-  console.log("b64-encoded attachment: ", b64EncodedAttachment);
-  const uint8ArrayAttachment = base64ToUInt8Array(b64EncodedAttachment);
-  console.log("uint8array attachment: ", uint8ArrayAttachment);
+  let attachments = [];
+  for (let index = 2; index < messagePartsArray.length - 1; index++) {
+    //Subtracting 1 from array length because the last element isn't an attachment: is always "--" as a result of splitting
+    const b64EncodedAttachment = messagePartsArray[index].split("\n\n")[1];
+    console.log(
+      "b64-encoded attachment " + (index - 1).toString() + ": ",
+      b64EncodedAttachment
+    );
+    const uint8ArrayAttachment = base64ToUInt8Array(b64EncodedAttachment);
+    console.log(
+      "uint8array attachment " + (index - 1).toString() + ": ",
+      uint8ArrayAttachment
+    );
+    attachments.push(uint8ArrayAttachment);
+  }
 
   let result = {};
-  let attachments = [];
-  attachments.push(uint8ArrayAttachment);
   result.body = body;
   result.attachments = attachments;
   return result;
