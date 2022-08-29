@@ -136,3 +136,39 @@ export function parseMIMEmailWithAttachments(mailAsString) {
   result.attachments = attachments;
   return result;
 }
+
+/**
+ * Generates a file from a Uint8Array and then initiate its download.
+ * Code adapted from https://stackoverflow.com/questions/25354313/saving-a-uint8array-to-a-binary-file
+ * @param data {Uint8Array}
+ * @param fileName {String}
+ * @param mimeType {String}
+ */
+export function createAndDownloadFile(data, fileName, mimeType) {
+  let blob, url;
+  blob = new Blob([data], {
+    type: mimeType,
+  });
+  url = window.URL.createObjectURL(blob);
+  downloadURL(url, fileName);
+  setTimeout(function () {
+    return window.URL.revokeObjectURL(url);
+  }, 1000);
+}
+
+/**
+ * Generates a link to download a file.
+ * Code adapted from https://stackoverflow.com/questions/25354313/saving-a-uint8array-to-a-binary-file
+ * @param data {Uint8Array}
+ * @param fileName {String}
+ */
+function downloadURL(data, fileName) {
+  let a;
+  a = document.createElement("a");
+  a.href = data;
+  a.download = fileName;
+  document.body.appendChild(a);
+  a.style = "display: none";
+  a.click();
+  a.remove();
+}

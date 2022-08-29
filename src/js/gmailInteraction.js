@@ -12,6 +12,7 @@ import {
   generateBody,
   uint8ArrayToBase64,
   parseMIMEmailWithAttachments,
+  createAndDownloadFile,
 } from "./helpers";
 
 console.log("ContentScript loaded");
@@ -21,7 +22,7 @@ const subject = "PostGuard encrypted email";
 const pkg = "https://main.irmaseal-pkg.ihub.ru.nl";
 
 /**
- * Wraps up the steps needed
+ * Wraps up the steps needed to decrypt a message
  * @param extensionID {String}
  * @param message {Uint8Array}
  * @param identity {String}
@@ -120,6 +121,20 @@ function requestDecryption(extensionID, message, identity, callback) {
  */
 function isPostguardAttachment(attachment) {
   return attachment.name.toLowerCase() === "postguard.encrypted";
+}
+
+function attachmentsPopup(gmail, attachmentsArray) {
+  const html =
+    "<p>This email contains one or more attachments. Click OK to download them.</p>";
+  gmail.tools.add_modal_window("Download attachments", html, () => {
+    for (let attachment of attachmentsArray) {
+      createAndDownloadFile(
+        attachment,
+        "PostGuard decrypted attachment",
+        "application/octet-stream"
+      ); //TODO: find out how to recover the attachment's original file name
+    }
+  });
 }
 
 // loader-code: wait until gmail.js has finished loading, before triggering actual extension-code.
