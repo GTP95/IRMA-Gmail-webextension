@@ -22,9 +22,9 @@ const pkg = "https://main.irmaseal-pkg.ihub.ru.nl";
 
 /**
  * Wraps up the steps needed
- * @param extensionID
- * @param message
- * @param identity
+ * @param extensionID {String}
+ * @param message {Uint8Array}
+ * @param identity {String}
  * @param callback
  */
 function requestDecryption(extensionID, message, identity, callback) {
