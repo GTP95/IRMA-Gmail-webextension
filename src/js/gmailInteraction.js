@@ -134,6 +134,7 @@ function attachmentsPopup(gmail, attachmentsArray) {
         "application/octet-stream"
       ); //TODO: find out how to recover the attachment's original file name
     }
+    gmail.tools.remove_modal_window(); //Close the popup after initiating the attachment's download
   });
 }
 
@@ -159,7 +160,9 @@ function startExtension(gmail) {
     const userEmail = gmail.get.user_email();
     console.log("Hello, " + userEmail + ". This is your extension talking!");
 
+    /********************/
     /* VIEWING AN EMAIL */
+    /********************/
 
     gmail.observe.on("view_email", (domEmail) => {
       console.log("Looking at email:", domEmail);
@@ -213,7 +216,7 @@ function startExtension(gmail) {
                       parsedEmailObject.raw
                     );
                     domEmail.body(result.body);
-                    //Handle attachments here...
+                    attachmentsPopup(gmail, result.attachments);
                   } else domEmail.body(" "); //Set an empty body if the original email doesn't have one. Cosmetic functionality to remove the instructions about how to decrypt
                   //set email's subject
                   const subjectNode = gmail.dom.email_subject();
@@ -225,7 +228,9 @@ function startExtension(gmail) {
       }
     });
 
+    /**********************/
     /* COMPOSING AN EMAIL */
+    /**********************/
 
     gmail.observe.on("compose", (compose) => {
       console.log("New compose window is opened!", compose);
