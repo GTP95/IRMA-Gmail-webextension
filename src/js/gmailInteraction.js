@@ -295,10 +295,11 @@ function startExtension(gmail) {
           // And add them to the email
           for (const attachment of attachmentsData) {
             console.log("attachment: ", attachment);
+            console.log("Attachment's file name: ", attachment.filename);
             console.log("Reported type of attachment: ", typeof attachment);
 
             msg.setAttachment(
-              "Encrypted attachment",
+              attachment.filename,
               `text/plain`,
               uint8ArrayToBase64(attachment)
             ); //For the attachment's type I can only use text/html or text/plain
