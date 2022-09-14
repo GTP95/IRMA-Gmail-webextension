@@ -268,6 +268,8 @@ function startExtension(gmail) {
           const emailSubject = compose_ref.subject();
           const emailAttachmentsInfo = compose_ref.attachments();
           console.log("Recipients: ", recipientsArray);
+          console.log("Subject: ", emailSubject);
+          console.log("Body: ", emailBody);
           console.log("Attachments: ", emailAttachmentsInfo);
 
           // create a mime object representing the email
@@ -276,7 +278,7 @@ function startExtension(gmail) {
           msg.setSender(userEmail); // I have to duplicate some information for compatibility with the other addons
           // @ts-ignore
           msg.setRecipients(recipientsAddressesArray);
-          msg.setSubject(emailSubject);
+          msg.setSubject(emailSubject === "" ? "(No subject)" : emailSubject); //I need to put something in the subject, otherwise mimetext doesn't generate an header
           msg.setMessage("text/plain", emailBody); // Maybe also works without specifying the type, but body() returns a string anyway
 
           // Let's grab all the attachments
