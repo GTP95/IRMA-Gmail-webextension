@@ -7,6 +7,7 @@
     "start": "node utils/webserver.js"
   },
   "devDependencies": {
+    "@playwright/test": "^1.25.2",
     "clean-webpack-plugin": "4.x",
     "copy-webpack-plugin": "11.x",
     "css-loader": "6.x",
