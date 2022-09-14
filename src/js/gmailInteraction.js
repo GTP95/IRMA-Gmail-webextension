@@ -278,7 +278,7 @@ function startExtension(gmail) {
           msg.setSender(userEmail); // I have to duplicate some information for compatibility with the other addons
           // @ts-ignore
           msg.setRecipients(recipientsAddressesArray);
-          msg.setSubject(emailSubject === "" ? "(No subject)" : emailSubject); //I need to put something in the subject, otherwise mimetext doesn't generate an header
+          msg.setSubject(emailSubject ? "(No subject)" : emailSubject); //I need to put something in the subject, otherwise mimetext doesn't generate an header
           msg.setMessage("text/plain", emailBody); // Maybe also works without specifying the type, but body() returns a string anyway
 
           // Let's grab all the attachments
